@@ -1,12 +1,13 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-// import { NotificationsPanel } from "../NotificationsPanel";
 import { ProfileModal } from "../ProfileModal";
 import { translateRole } from "../../utils/translateRole";
 import { useUser } from "../../contexts/userContext";
 import { useAppContext } from "../../contexts/appContext";
 import type { UserRole } from "../../types/userRoleType";
 import { Icon } from "../Icon";
+import { GetUnreadNotificationsCount } from "../../services/notificationsService";
+import { NotificationsPanel } from "../Notifications/NotificationsPanel";
 
 interface HeaderProps {
   setMobileOpen: (open: boolean) => void;
@@ -17,22 +18,31 @@ function allowsAllCycles(role: UserRole | null) {
 }
 
 export function Header({ setMobileOpen }: HeaderProps) {
-  // const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
-  // const [cycles, setCycles] = useState<string[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   const navigate = useNavigate();
-
   const { user } = useUser();
   const { cycle, setCycle, cycles, selectedRole, setSelectedRole } =
     useAppContext();
 
   const availableViews = user?.roles ?? [];
 
+  const refreshUnreadCount = useCallback(() => {
+    GetUnreadNotificationsCount()
+      .then((response) => setUnreadCount(response.unread ?? 0))
+      .catch(() => setUnreadCount(0));
+  }, []);
+
   function handleRoleChange(role: UserRole) {
     setSelectedRole(role);
     navigate("/");
   }
+
+  useEffect(() => {
+    refreshUnreadCount();
+  }, [refreshUnreadCount]);
 
   useEffect(() => {
     if (cycle === "all" && !allowsAllCycles(selectedRole) && cycles.length) {
@@ -57,7 +67,6 @@ export function Header({ setMobileOpen }: HeaderProps) {
             <h1 className="truncate text-sm font-semibold text-slate-800 sm:text-base">
               Sistema de Gerenciamento de Iniciação Científica
             </h1>
-
             <p className="hidden text-xs text-slate-500 sm:block">
               Universidade do Estado do Amazonas — UEA
             </p>
@@ -69,15 +78,14 @@ export function Header({ setMobileOpen }: HeaderProps) {
             <span className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
               Visão do ciclo
             </span>
-
             <select
               value={cycle}
-              onChange={(e) => setCycle(e.target.value)}
+              onChange={(event) => setCycle(event.target.value)}
               className="max-w-36 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
             >
-              {cycles.map((c) => (
-                <option key={c} value={c}>
-                  {c}
+              {cycles.map((item) => (
+                <option key={item} value={item}>
+                  {item}
                 </option>
               ))}
               {allowsAllCycles(selectedRole) && (
@@ -91,7 +99,6 @@ export function Header({ setMobileOpen }: HeaderProps) {
               <span className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
                 Visualização
               </span>
-
               <select
                 value={selectedRole ?? ""}
                 onChange={(event) =>
@@ -108,15 +115,19 @@ export function Header({ setMobileOpen }: HeaderProps) {
             </label>
           )}
 
-          {/* <button
+          <button
             type="button"
-            aria-label="Notificações"
+            aria-label={`Notificações${unreadCount > 0 ? `, ${unreadCount} não lidas` : ""}`}
             onClick={() => setNotificationsOpen(true)}
             className="relative cursor-pointer rounded-xl p-2.5 text-slate-600 transition hover:bg-slate-100 hover:text-indigo-600"
           >
             <Icon name="bell" size={20} />
-            <span className="absolute right-2 top-2 h-2 w-2 rounded-full border-2 border-white bg-red-500" />
-          </button> */}
+            {unreadCount > 0 && (
+              <span className="absolute -right-0.5 -top-0.5 flex min-h-4 min-w-4 items-center justify-center rounded-full border-2 border-white bg-red-500 px-1 text-[9px] font-bold leading-none text-white">
+                {unreadCount > 99 ? "99+" : unreadCount}
+              </span>
+            )}
+          </button>
 
           <button
             type="button"
@@ -129,15 +140,16 @@ export function Header({ setMobileOpen }: HeaderProps) {
         </div>
       </header>
 
-      {/* {notificationsOpen && (
+      {notificationsOpen && (
         <NotificationsPanel
           close={() => setNotificationsOpen(false)}
-          navigate={(next) => {
+          navigate={(path) => {
             setNotificationsOpen(false);
-            navigate(next === "" || next === "overview" ? "/" : `/${next}`);
+            navigate(path);
           }}
+          onNotificationsChanged={refreshUnreadCount}
         />
-      )} */}
+      )}
 
       {profileOpen && <ProfileModal close={() => setProfileOpen(false)} />}
     </>
