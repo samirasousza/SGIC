@@ -29,6 +29,7 @@ import { EvaluationsPage } from "../pages/Evalutions/Evaluations";
 import { ProjectEvaluationDetail } from "../pages/Evalutions/EvaluationDetail";
 import { ReportsPage } from "../pages/Reports/Reports";
 import { ProjectReportsDetail } from "../pages/Reports/ReportsDetail";
+import { SpreadsheetsPage } from "../pages/Spreadsheets/Spreadsheets";
 
 function ScreenLoading() {
   return (
@@ -154,6 +155,8 @@ export function AppRoutes() {
             path="/projects/:projectId/reports"
             element={<ProjectReportsDetail />}
           />
+
+          <Route path="/spreadsheets" element={<SpreadsheetsPage />} />
 
           {/* Rotas administrativas: somente ADMIN */}
           <Route element={<AdminRoute />}>

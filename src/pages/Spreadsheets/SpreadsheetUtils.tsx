@@ -1,7 +1,9 @@
+import type { SpreadsheetDefinition } from "../../models/spreadsheetModel";
 
-export const spreadsheetDefinitions = [
+
+export const spreadsheetDefinitions: SpreadsheetDefinition[] = [
   {
-    id: 1,
+    id: "PARTICIPANTS",
     title: "Alunos Participantes",
     availability: "Parcial e final",
     sensitive: true,
@@ -22,7 +24,7 @@ export const spreadsheetDefinitions = [
     ],
   },
   {
-    id: 2,
+    id: "HONORABLE_MENTION",
     title: "Menção Honrosa",
     availability: "Somente final",
     sensitive: true,
@@ -31,16 +33,16 @@ export const spreadsheetDefinitions = [
     columns: ["CPF", "SISPROJ", "Nome do aluno", "Curso"],
   },
   {
-    id: 3,
+    id: "EVALUATORS",
     title: "Membros Avaliadores",
     availability: "Parcial e final",
     sensitive: true,
     description:
-      "Avaliadores que assinaram ao menos uma ficha, sem repetição por CPF.",
+      "Avaliadores que assinaram ao menos uma ficha, sem repetição por pessoa.",
     columns: ["CPF", "Nome completo"],
   },
   {
-    id: 4,
+    id: "GRADES",
     title: "Cálculo de Notas",
     availability: "Parcial e final",
     sensitive: false,
@@ -53,16 +55,16 @@ export const spreadsheetDefinitions = [
       "Aluno",
       "Orientador",
       "Nota orientador",
-      "Av. externo",
+      "Avaliador externo",
       "Nota externa",
-      "Av. interno",
+      "Avaliador interno",
       "Nota interna",
       "Aluno(a)",
       "Nota aluno",
     ],
   },
   {
-    id: 5,
+    id: "FINAL_EVALUATION",
     title: "Avaliação Final com Notas",
     availability: "Somente final",
     sensitive: false,
@@ -81,48 +83,5 @@ export const spreadsheetDefinitions = [
       "Média final",
       "Menção honrosa",
     ],
-  },
-];
-
-export const spreadsheetExportHistory = [
-  {
-    id: 1,
-    date: "18 mar 2026, 10h42",
-    title: "Alunos Participantes",
-    defense: "Parcial",
-    unit: "Escola Superior de Tecnologia",
-    format: "Excel",
-    responsible: "Carlos Lima",
-    sensitive: true,
-  },
-  {
-    id: 2,
-    date: "15 mar 2026, 16h08",
-    title: "Cálculo de Notas",
-    defense: "Parcial",
-    unit: "Escola Superior de Tecnologia",
-    format: "PDF",
-    responsible: "Carlos Lima",
-    sensitive: false,
-  },
-  {
-    id: 3,
-    date: "12 mar 2026, 09h30",
-    title: "Membros Avaliadores",
-    defense: "Parcial",
-    unit: "Escola Superior de Ciências da Saúde",
-    format: "CSV",
-    responsible: "Mariana Costa",
-    sensitive: true,
-  },
-  {
-    id: 4,
-    date: "08 mar 2026, 14h15",
-    title: "Alunos Participantes",
-    defense: "Final",
-    unit: "Centro de Estudos Superiores de Parintins",
-    format: "Excel",
-    responsible: "João Silva",
-    sensitive: true,
   },
 ];

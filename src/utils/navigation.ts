@@ -10,8 +10,8 @@ interface NavigationOption {
 export const navigationByRole: Record<UserRole, NavigationOption[]> = {
   STUDENT: [
     { screen: "", label: "Início", icon: "home" },
-    { screen: "projects", label: "Meus projetos", icon: "file" },
-    { screen: "reports", label: "Relatórios", icon: "file-text" },
+    { screen: "projects", label: "Meus projetos", icon: "folder" },
+    { screen: "reports", label: "Relatórios", icon: "file" },
   ],
 
   ADVISOR: [

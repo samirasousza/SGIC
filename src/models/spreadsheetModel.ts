@@ -8,4 +8,11 @@ export interface GetSpreadsheetParams {
   format?: ExportFormat;
 }
 
-export type { ExportFormat, SpreadsheetType };
+export interface SpreadsheetDefinition {
+  id: SpreadsheetType;
+  title: string;
+  availability: "Parcial e final" | "Somente final";
+  sensitive: boolean;
+  description: string;
+  columns: string[];
+}
