@@ -1,22 +1,35 @@
 import { Routes, Route } from "react-router-dom";
+import { useState } from "react";
+
+import type { Role, Screen } from "../pages/Login/LoginTypes";
+
 import { LoginPage } from "../pages/Login/Login";
 import { HomePage } from "../pages/Home/Home";
-import { AppLayout } from "../components/AppLayout";
-import { useState } from "react";
-import type { Role } from "../pages/Login/LoginTypes";
 import { ProjectsPage } from "../pages/Projects/Projects";
 import { ProjectDetail } from "../pages/Projects/ProjectDetails";
 
+import { AppLayout } from "../components/AppLayout";
+
 export function AppRoutes() {
   const [role, setRole] = useState<Role>("Aluno");
-  const [accountRole, setAccountRole] = useState<Role>("Avaliador");
   const [screen, setScreen] = useState<Screen>("overview");
+  const [accountRole] = useState<Role>("Avaliador");
   const [cycle, setCycle] = useState("2025–2026");
 
   function logout() {
-    // Substitua pela sua lógica de logout.
     window.location.href = "/login";
   }
+
+  const layoutProps = {
+    role,
+    accountRole,
+    setRole,
+    screen,
+    setScreen,
+    cycle,
+    setCycle,
+    logout,
+  };
 
   return (
     <Routes>
@@ -25,16 +38,7 @@ export function AppRoutes() {
       <Route
         path="/"
         element={
-          <AppLayout
-            role={role}
-            accountRole={accountRole}
-            setRole={setRole}
-            screen={screen}
-            setScreen={setScreen}
-            cycle={cycle}
-            setCycle={setCycle}
-            logout={logout}
-          >
+          <AppLayout {...layoutProps}>
             <HomePage />
           </AppLayout>
         }
@@ -43,16 +47,7 @@ export function AppRoutes() {
       <Route
         path="/project"
         element={
-          <AppLayout
-            role={role}
-            accountRole={accountRole}
-            setRole={setRole}
-            screen={screen}
-            setScreen={setScreen}
-            cycle={cycle}
-            setCycle={setCycle}
-            logout={logout}
-          >
+          <AppLayout {...layoutProps}>
             <ProjectsPage />
           </AppLayout>
         }
@@ -61,47 +56,11 @@ export function AppRoutes() {
       <Route
         path="/projects/:projectId"
         element={
-          <AppLayout
-            role={role}
-            accountRole={accountRole}
-            setRole={setRole}
-            screen={screen}
-            setScreen={setScreen}
-            cycle={cycle}
-            setCycle={setCycle}
-            logout={logout}
-          >
+          <AppLayout {...layoutProps}>
             <ProjectDetail />
           </AppLayout>
         }
       />
-
-      {/* <Route
-        path="/projects/:projectId/reports"
-        element={
-          <AppLayout {...layoutProps}>
-            <ProjectReports />
-          </AppLayout>
-        }
-      />
-
-      <Route
-        path="/projects/:projectId/evaluations"
-        element={
-          <AppLayout {...layoutProps}>
-            <ProjectEvaluations />
-          </AppLayout>
-        }
-      />
-
-      <Route
-        path="/projects/:projectId/evaluators"
-        element={
-          <AppLayout {...layoutProps}>
-            <ProjectEvaluators />
-          </AppLayout>
-        }
-      /> */}
 
       <Route path="*" element={<h1>Página não encontrada</h1>} />
     </Routes>

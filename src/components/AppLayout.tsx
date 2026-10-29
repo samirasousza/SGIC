@@ -1,4 +1,3 @@
-
 import { useState, type ReactNode } from "react";
 import type { Role, Screen } from "../pages/Login/LoginTypes";
 import { Header } from "./Header";
@@ -32,12 +31,9 @@ export function AppLayout({
   return (
     <div className="min-h-screen bg-slate-50">
       <Sidebar
-        role={role}
         accountRole={accountRole}
-        screen={screen}
         mobileOpen={mobileOpen}
         setMobileOpen={setMobileOpen}
-        setScreen={setScreen}
         logout={logout}
       />
 

@@ -9,6 +9,7 @@ export type Role =
   | "Administrador";
 
 export type Screen =
+  | ""
   | "overview"
   | "project"
   | "unit-projects"
@@ -28,28 +29,85 @@ export type Screen =
   | "user-edit"
   | "settings";
 
+export interface NavOption {
+  screen: Screen;
+  label: string;
+  icon: string;
+  allowedRoles?: Role[];
+}
 
-export const navByRole: Record<Role, { screen: Screen; label: string; icon: string }[]> = {
+export const navOptions: NavOption[] = [
+  {
+    screen: "",
+    label: "Visão geral",
+    icon: "home",
+  },
+  {
+    screen: "project",
+    label: "Meus projetos",
+    icon: "folder",
+  },
+  {
+    screen: "unit-projects",
+    label: "Projetos da unidade",
+    icon: "chart",
+  },
+  {
+    screen: "reports",
+    label: "Relatórios",
+    icon: "file",
+  },
+  {
+    screen: "review-boards",
+    label: "Avaliações",
+    icon: "clipboard",
+  },
+  {
+    screen: "spreadsheets",
+    label: "Planilhas",
+    icon: "chart",
+  },
+  {
+    screen: "users",
+    label: "Usuários",
+    icon: "users",
+  },
+  {
+    screen: "settings",
+    label: "Configurações",
+    icon: "settings",
+  },
+];
+
+export const navByRole: Record<
+  Role,
+  { screen: Screen; label: string; icon: string }[]
+> = {
   Aluno: [
-    { screen: "overview", label: "Visão geral", icon: "home" }, { screen: "project", label: "Meus projetos", icon: "folder" },
+    { screen: "overview", label: "Visão geral", icon: "home" },
+    { screen: "project", label: "Meus projetos", icon: "folder" },
     { screen: "reports", label: "Relatórios", icon: "file" },
   ],
   Orientador: [
-    { screen: "overview", label: "Visão geral", icon: "home" }, { screen: "project", label: "Meus projetos", icon: "folder" },
+    { screen: "overview", label: "Visão geral", icon: "home" },
+    { screen: "project", label: "Meus projetos", icon: "folder" },
     { screen: "reports", label: "Relatórios", icon: "file" },
     { screen: "review-boards", label: "Avaliações", icon: "clipboard" },
   ],
   "Orientador e avaliador": [
-    { screen: "overview", label: "Visão geral", icon: "home" }, { screen: "project", label: "Meus projetos", icon: "folder" },
+    { screen: "overview", label: "Visão geral", icon: "home" },
+    { screen: "project", label: "Meus projetos", icon: "folder" },
     { screen: "reports", label: "Relatórios", icon: "file" },
     { screen: "review-boards", label: "Avaliações", icon: "clipboard" },
   ],
   Coorientador: [
-    { screen: "overview", label: "Visão geral", icon: "home" }, { screen: "project", label: "Meus projetos", icon: "folder" },
+    { screen: "overview", label: "Visão geral", icon: "home" },
+    { screen: "project", label: "Meus projetos", icon: "folder" },
     { screen: "reports", label: "Relatórios", icon: "file" },
   ],
   Avaliador: [
-    { screen: "overview", label: "Visão geral", icon: "home" }, { screen: "boards", label: "Avaliações", icon: "clipboard" },
+    { screen: "overview", label: "Visão geral", icon: "home" },
+    { screen: "boards", label: "Avaliações", icon: "clipboard" },
   ],
   "Comitê local": [
     { screen: "overview", label: "Visão geral", icon: "home" },
@@ -66,9 +124,11 @@ export const navByRole: Record<Role, { screen: Screen; label: string; icon: stri
     { screen: "spreadsheets", label: "Planilhas", icon: "chart" },
   ],
   Administrador: [
-    { screen: "overview", label: "Visão geral", icon: "home" }, { screen: "project", label: "Projetos", icon: "folder" },
+    { screen: "overview", label: "Visão geral", icon: "home" },
+    { screen: "project", label: "Projetos", icon: "folder" },
     { screen: "spreadsheets", label: "Planilhas", icon: "chart" },
-    { screen: "users", label: "Usuários", icon: "users" }, { screen: "settings", label: "Configurações", icon: "settings" },
+    { screen: "users", label: "Usuários", icon: "users" },
+    { screen: "settings", label: "Configurações", icon: "settings" },
   ],
 };
 

@@ -557,53 +557,6 @@ export function ProjectDetail() {
             </div>
           </Card>
         </div>
-
-        {/* Situação do projeto
-        <aside className="min-w-0">
-          <Card>
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between xl:flex-col">
-              <div>
-                <h2 className="text-base font-semibold text-slate-800">
-                  Situação do projeto
-                </h2>
-                <p className="mt-1 text-sm text-slate-500">
-                  Ciclo {project.cycle}
-                </p>
-              </div>
-
-              <span
-                className={`w-fit rounded-full border px-3 py-1 text-xs font-semibold ${statusClass}`}
-              >
-                {project.status}
-              </span>
-            </div>
-
-            <div className="mb-3 mt-6 flex items-baseline gap-2">
-              <strong className="text-4xl font-bold tracking-tight text-slate-900">
-                {project.progress}%
-              </strong>
-              <span className="text-xs text-slate-500">do ciclo concluído</span>
-            </div>
-
-            <div
-              className="h-2 w-full overflow-hidden rounded-full bg-slate-100"
-              role="progressbar"
-              aria-label="Progresso do ciclo"
-              aria-valuenow={project.progress}
-              aria-valuemin={0}
-              aria-valuemax={100}
-            >
-              <div
-                className={`h-full rounded-full transition-all ${
-                  archived ? "bg-emerald-500" : "bg-indigo-600"
-                }`}
-                style={{
-                  width: `${Math.min(100, Math.max(0, project.progress))}%`,
-                }}
-              />
-            </div>
-          </Card>
-        </aside> */}
       </div>
     </div>
   );

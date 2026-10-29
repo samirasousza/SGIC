@@ -1,36 +1,30 @@
 import { useState } from "react";
-import {
-  navByRole,
-  profileName,
-  type Role,
-  type Screen,
-} from "../pages/Login/LoginTypes";
+import { useLocation, useNavigate } from "react-router-dom";
+
+import { navOptions, profileName, type Role } from "../pages/Login/LoginTypes";
+
 import { Icon } from "./Icon";
 import { Logo } from "./Logo";
 import { ProfileModal } from "./ProfileModal";
 
 interface SidebarProps {
-  role: Role;
   accountRole: Role;
-  screen: Screen;
   mobileOpen: boolean;
   setMobileOpen: (open: boolean) => void;
-  setScreen: (screen: Screen) => void;
   logout: () => void;
 }
 
 export function Sidebar({
-  role,
   accountRole,
-  screen,
   mobileOpen,
   setMobileOpen,
-  setScreen,
   logout,
 }: SidebarProps) {
   const [profileOpen, setProfileOpen] = useState(false);
 
   const name = profileName(accountRole);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const initials = name
     .split(" ")
@@ -39,11 +33,6 @@ export function Sidebar({
     .map((part) => part[0])
     .join("")
     .toUpperCase();
-
-  function navigate(next: Screen) {
-    setScreen(next);
-    setMobileOpen(false);
-  }
 
   return (
     <>
@@ -79,15 +68,18 @@ export function Sidebar({
           </p>
 
           <div className="space-y-1">
-            {navByRole[role].map((item) => {
-              const active = screen === item.screen;
+            {navOptions.map((item) => {
+              const active = location.pathname === `/${item.screen}`;
 
               return (
                 <button
                   key={item.screen}
                   type="button"
-                  onClick={() => navigate(item.screen)}
-                  className={`cursor-pointer group flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm font-medium transition ${
+                  onClick={() => {
+                    navigate(item.screen ? `/${item.screen}` : "/");
+                    setMobileOpen(false);
+                  }}
+                  className={`group flex w-full cursor-pointer items-center gap-3 rounded-xl px-3 py-3 text-left text-sm font-medium transition ${
                     active
                       ? "bg-indigo-50 text-indigo-700"
                       : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
@@ -108,7 +100,7 @@ export function Sidebar({
 
         <div className="border-t border-slate-100 p-4">
           <div
-            className="cursor-pointer mb-4 flex items-center gap-3 rounded-xl bg-slate-50 p-3"
+            className="mb-4 flex cursor-pointer items-center gap-3 rounded-xl bg-slate-50 p-3"
             onClick={() => setProfileOpen(true)}
           >
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-sm font-bold text-indigo-700">
@@ -128,13 +120,14 @@ export function Sidebar({
           <button
             type="button"
             onClick={logout}
-            className="cursor-pointer flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium text-red-600 transition hover:bg-red-50"
+            className="flex w-full cursor-pointer items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium text-red-600 transition hover:bg-red-50"
           >
             <Icon name="logout" size={18} />
             Sair do sistema
           </button>
         </div>
       </aside>
+
       {profileOpen && (
         <ProfileModal role={accountRole} close={() => setProfileOpen(false)} />
       )}
