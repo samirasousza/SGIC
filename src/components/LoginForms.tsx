@@ -2,9 +2,12 @@ import { useState } from "react";
 import { Logo } from "./Logo";
 import { Icon } from "./Icon";
 import { Button } from "./Button";
+import { useNavigate } from "react-router";
 
 export function LoginForms() {
   const [message, setMessage] = useState("");
+
+  const navigate = useNavigate();
 
   const submit = async (formData: FormData) => {
     setMessage("");
@@ -81,7 +84,7 @@ export function LoginForms() {
 
         {/* Botão de Envio */}
         <div className="mt-1 w-full [&>button]:min-h-[48px] [&>button]:w-full [&>button]:justify-center">
-          <Button type="submit" icon="arrow">
+          <Button type="submit" icon="arrow" onClick={() => navigate("/")}>
             Entrar
           </Button>
         </div>

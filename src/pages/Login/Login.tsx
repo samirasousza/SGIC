@@ -1,7 +1,8 @@
 import { Logo } from "../../components/Logo";
 import { LoginForms } from "../../components/LoginForms";
 
-export function Login() {
+export function LoginPage() {
+
   return (
     /* .login-shell: grid dividido em 2 colunas no desktop, tela cheia única no mobile */
     <main className="min-h-screen bg-surface md:grid md:grid-cols-[minmax(420px,46%)_1fr]">
@@ -46,7 +47,7 @@ export function Login() {
       <section className="grid min-h-screen place-items-center bg-surface p-6 sm:p-8 md:p-12">
         <LoginForms
         //   onBack={() => setCredentialLoginOpen(false)}
-        //   onEnter={onEnter}
+        // onEnter={() => navigate("/")}
         />
       </section>
     </main>
