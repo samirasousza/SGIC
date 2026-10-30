@@ -164,7 +164,6 @@ export function ReportsPage({
       />
 
       <PageHeader
-        eyebrow="Acompanhamento de entregas"
         title="Relatórios por projeto"
         description="Consulte a situação de cada relatório no ciclo selecionado."
       />

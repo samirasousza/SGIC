@@ -70,7 +70,6 @@ export function EvaluationsPage({ cycle }: { cycle: string }) {
       />
 
       <PageHeader
-        eyebrow="Comitê local • Visão da unidade"
         title="Avaliações por defesa"
         description="Acompanhe as quatro avaliações obrigatórias de cada projeto da unidade."
       />

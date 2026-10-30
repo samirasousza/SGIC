@@ -14,6 +14,7 @@ import { ProjectReportsDetail } from "../pages/Reports/ReportsDetail";
 import { EvaluationsPage } from "../pages/Evalutions/Evaluations";
 import { ProjectEvaluationDetail } from "../pages/Evalutions/EvaluationDetail";
 import { EvaluatorsPage } from "../pages/Evaluaters/Evaluaters";
+import { SpreadsheetsPage } from "../pages/Spreadsheets/Spreadsheets";
 
 export function AppRoutes() {
   const [role, setRole] = useState<Role>("Orientador");
@@ -108,6 +109,15 @@ export function AppRoutes() {
         element={
           <AppLayout {...layoutProps}>
             <EvaluatorsPage role={layoutProps.role} />
+          </AppLayout>
+        }
+      />
+
+      <Route
+        path="/spreadsheets"
+        element={
+          <AppLayout {...layoutProps}>
+            <SpreadsheetsPage role={layoutProps.role} cycle={cycle} />
           </AppLayout>
         }
       />

@@ -102,7 +102,12 @@ export function ProjectsPage() {
 
   return (
     <div className="space-y-6">
-      <Breadcrumbs items={[{ label: "Início" }, { label: "Projetos" }]} />
+      <Breadcrumbs
+        items={[
+          { label: "Início", onClick: () => navigate("/") },
+          { label: "Projetos" },
+        ]}
+      />
 
       <PageHeader
         title="Projetos"
