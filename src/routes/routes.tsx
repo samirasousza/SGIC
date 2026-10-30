@@ -13,9 +13,10 @@ import { ReportsPage } from "../pages/Reports/Reports";
 import { ProjectReportsDetail } from "../pages/Reports/ReportsDetail";
 import { EvaluationsPage } from "../pages/Evalutions/Evaluations";
 import { ProjectEvaluationDetail } from "../pages/Evalutions/EvaluationDetail";
+import { EvaluatorsPage } from "../pages/Evaluaters/Evaluaters";
 
 export function AppRoutes() {
-  const [role, setRole] = useState<Role>("Aluno");
+  const [role, setRole] = useState<Role>("Orientador");
   const [screen, setScreen] = useState<Screen>("overview");
   const [accountRole] = useState<Role>("Avaliador");
   const [cycle, setCycle] = useState("2025–2026");
@@ -98,6 +99,15 @@ export function AppRoutes() {
         element={
           <AppLayout {...layoutProps}>
             <ProjectEvaluationDetail role={role} />
+          </AppLayout>
+        }
+      />
+
+      <Route
+        path="/projects/:projectId/evaluators"
+        element={
+          <AppLayout {...layoutProps}>
+            <EvaluatorsPage role={layoutProps.role} />
           </AppLayout>
         }
       />

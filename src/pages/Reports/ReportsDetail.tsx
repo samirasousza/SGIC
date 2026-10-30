@@ -253,7 +253,7 @@ export function ProjectReportsDetail({ role }: ProjectReportsDetailProps) {
                         <button
                           type="button"
                           onClick={() => setActiveReport(item.name)}
-                          className="text-indigo-600 hover:underline"
+                          className="cursor-pointer text-indigo-600 hover:underline"
                         >
                           1 comentário do orientador
                         </button>
@@ -272,7 +272,7 @@ export function ProjectReportsDetail({ role }: ProjectReportsDetailProps) {
                           {sent && (
                             <button
                               type="button"
-                              className="inline-flex items-center gap-1 text-sm text-slate-600 hover:text-indigo-600"
+                              className="cursor-pointer inline-flex items-center gap-1 text-sm text-slate-600 hover:text-indigo-600"
                             >
                               <Icon name="download" size={15} />
                               Baixar
@@ -291,7 +291,7 @@ export function ProjectReportsDetail({ role }: ProjectReportsDetailProps) {
                                 setActiveReport(item.name);
                               }
                             }}
-                            className="text-sm font-medium text-indigo-600 hover:text-indigo-800"
+                            className="cursor-pointer text-sm font-medium text-indigo-600 hover:text-indigo-800"
                           >
                             {item.status === "Ajustes solicitados"
                               ? "Ver ajustes"
