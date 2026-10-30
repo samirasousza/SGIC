@@ -4,7 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Breadcrumbs } from "../../components/Breadcrumbs";
 import { Card } from "../../components/Card";
 import { Icon } from "../../components/Icon";
-import { ProjectDataField } from "../../components/ProjectDataField";
+import { ProjectDataField } from "../../components/Projects/ProjectDataField";
 
 import { projectRows } from "./ProjectsData";
 import { Badge } from "../../components/Badge";

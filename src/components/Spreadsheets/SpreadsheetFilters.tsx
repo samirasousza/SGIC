@@ -1,8 +1,7 @@
-
-import { Badge } from "./Badge";
-import { Card } from "./Card";
-import { Icon } from "./Icon";
-import type { Role } from "../pages/Login/LoginTypes";
+import { Badge } from "../Badge";
+import { Card } from "../Card";
+import { Icon } from "../Icon";
+import type { Role } from "../../pages/Login/LoginTypes";
 
 interface SpreadsheetFiltersProps {
   role: Role;
@@ -82,10 +81,7 @@ export function SpreadsheetFilters({
             </select>
           ) : (
             <div className="flex min-h-11 flex-wrap items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
-              <Icon
-                name="folder"
-                size={17}
-              />
+              <Icon name="folder" size={17} />
 
               <span className="min-w-0 flex-1 text-sm text-slate-700">
                 {unit}

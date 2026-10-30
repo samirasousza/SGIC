@@ -1,9 +1,8 @@
-
-import { Badge } from "./Badge";
-import { Button } from "./Button";
-import { Card } from "./Card";
-import { Icon } from "./Icon";
-import type { spreadsheetDefinitions } from "../pages/Spreadsheets/SpreadsheetUtils";
+import { Badge } from "../Badge";
+import { Button } from "../Button";
+import { Card } from "../Card";
+import { Icon } from "../Icon";
+import type { spreadsheetDefinitions } from "../../pages/Spreadsheets/SpreadsheetUtils";
 
 type Spreadsheet = (typeof spreadsheetDefinitions)[number];
 
@@ -23,8 +22,7 @@ export function SpreadsheetCard({
 
   const disabled = finalOnlyDisabled || cycleRequired;
 
-  const recordCount =
-    sheet.id === 1 ? "18" : sheet.id === 3 ? "12" : "6";
+  const recordCount = sheet.id === 1 ? "18" : sheet.id === 3 ? "12" : "6";
 
   return (
     <Card
@@ -39,16 +37,10 @@ export function SpreadsheetCard({
           </span>
 
           <div className="flex flex-wrap justify-end gap-2">
-            {sheet.sensitive && (
-              <Badge tone="warning">Contém CPF</Badge>
-            )}
+            {sheet.sensitive && <Badge tone="warning">Contém CPF</Badge>}
 
             <Badge
-              tone={
-                sheet.availability === "Somente final"
-                  ? "neutral"
-                  : "info"
-              }
+              tone={sheet.availability === "Somente final" ? "neutral" : "info"}
             >
               {sheet.availability}
             </Badge>

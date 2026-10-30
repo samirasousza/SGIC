@@ -1,9 +1,8 @@
-
 import { useState } from "react";
-import { Button } from "./Button";
-import { Data } from "./Data";
-import { Icon } from "./Icon";
-import type { spreadsheetDefinitions } from "../pages/Spreadsheets/SpreadsheetUtils";
+import { Button } from "../Button";
+import { Data } from "../Data";
+import { Icon } from "../Icon";
+import type { spreadsheetDefinitions } from "../../pages/Spreadsheets/SpreadsheetUtils";
 
 export function SpreadsheetExportModal({
   sheet,
@@ -37,8 +36,7 @@ export function SpreadsheetExportModal({
     },
   ];
 
-  const recordCount =
-    sheet.id === 1 ? "18" : sheet.id === 3 ? "12" : "6";
+  const recordCount = sheet.id === 1 ? "18" : sheet.id === 3 ? "12" : "6";
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto p-4">

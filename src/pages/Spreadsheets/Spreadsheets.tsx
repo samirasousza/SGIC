@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router";
 
@@ -8,9 +7,9 @@ import { Button } from "../../components/Button";
 import { Card } from "../../components/Card";
 import { Icon } from "../../components/Icon";
 import { PageHeader } from "../../components/PageHeader";
-import { SpreadsheetExportModal } from "../../components/SpreadsheetExportModal";
-import { SpreadsheetCard } from "../../components/SpreadsheetCard";
-import { SpreadsheetFilters } from "../../components/SpreadsheetFilters";
+import { SpreadsheetExportModal } from "../../components/Spreadsheets/SpreadsheetExportModal";
+import { SpreadsheetCard } from "../../components/Spreadsheets/SpreadsheetCard";
+import { SpreadsheetFilters } from "../../components/Spreadsheets/SpreadsheetFilters";
 
 import type { Role } from "../Login/LoginTypes";
 import {
@@ -76,10 +75,7 @@ export function SpreadsheetsPage({
       {/* Aviso de ciclo */}
       {cycleRequired && (
         <div className="mb-6 flex gap-3 rounded-xl border border-blue-200 bg-blue-50 p-4">
-          <Icon
-            name="info"
-            size={20}
-          />
+          <Icon name="info" size={20} />
 
           <div>
             <strong className="text-sm font-semibold text-blue-900">
@@ -195,10 +191,7 @@ export function SpreadsheetsPage({
 
             <tbody className="divide-y divide-slate-100">
               {exportRows.map((item) => (
-                <tr
-                  key={item.id}
-                  className="transition hover:bg-slate-50"
-                >
+                <tr key={item.id} className="transition hover:bg-slate-50">
                   <td className="whitespace-nowrap px-4 py-3 text-sm text-slate-500">
                     {item.date}
                   </td>
