@@ -22,6 +22,7 @@ export type Screen =
   | "spreadsheets"
   | "boards"
   | "review-boards"
+  | "evaluations"
   | "board-evaluation"
   | "evaluation"
   | "users"
@@ -47,18 +48,18 @@ export const navOptions: NavOption[] = [
     label: "Meus projetos",
     icon: "folder",
   },
-  {
-    screen: "unit-projects",
-    label: "Projetos da unidade",
-    icon: "chart",
-  },
+  // {
+  //   screen: "unit-projects",
+  //   label: "Projetos da unidade",
+  //   icon: "chart",
+  // },
   {
     screen: "reports",
     label: "Relatórios",
     icon: "file",
   },
   {
-    screen: "review-boards",
+    screen: "evaluations",
     label: "Avaliações",
     icon: "clipboard",
   },
@@ -67,16 +68,16 @@ export const navOptions: NavOption[] = [
     label: "Planilhas",
     icon: "chart",
   },
-  {
-    screen: "users",
-    label: "Usuários",
-    icon: "users",
-  },
-  {
-    screen: "settings",
-    label: "Configurações",
-    icon: "settings",
-  },
+  // {
+  //   screen: "users",
+  //   label: "Usuários",
+  //   icon: "users",
+  // },
+  // {
+  //   screen: "settings",
+  //   label: "Configurações",
+  //   icon: "settings",
+  // },
 ];
 
 export const navByRole: Record<

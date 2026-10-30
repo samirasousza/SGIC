@@ -7,7 +7,6 @@ import { PageHeader } from "./PageHeader";
 
 export function ManagementOverview({
   role,
-  navigate,
 }: {
   role: Role;
   navigate: (screen: Screen) => void;

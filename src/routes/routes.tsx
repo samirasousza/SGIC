@@ -11,6 +11,8 @@ import { ProjectDetail } from "../pages/Projects/ProjectDetails";
 import { AppLayout } from "../components/AppLayout";
 import { ReportsPage } from "../pages/Reports/Reports";
 import { ProjectReportsDetail } from "../pages/Reports/ReportsDetail";
+import { EvaluationsPage } from "../pages/Evalutions/Evaluations";
+import { ProjectEvaluationDetail } from "../pages/Evalutions/EvaluationDetail";
 
 export function AppRoutes() {
   const [role, setRole] = useState<Role>("Aluno");
@@ -78,6 +80,24 @@ export function AppRoutes() {
         element={
           <AppLayout {...layoutProps}>
             <ProjectReportsDetail role={role} />
+          </AppLayout>
+        }
+      />
+
+      <Route
+        path="/evaluations"
+        element={
+          <AppLayout {...layoutProps}>
+            <EvaluationsPage cycle={cycle} />
+          </AppLayout>
+        }
+      />
+
+      <Route
+        path="/projects/:projectId/evaluations"
+        element={
+          <AppLayout {...layoutProps}>
+            <ProjectEvaluationDetail role={role} />
           </AppLayout>
         }
       />

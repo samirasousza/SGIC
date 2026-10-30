@@ -244,7 +244,7 @@ export function ReportsPage({
           <table className="w-full min-w-[900px] text-left text-sm">
             <thead className="border-b border-slate-200 bg-slate-50 text-xs uppercase text-slate-500">
               <tr>
-                <th className="sticky left-0 bg-slate-50 px-4 py-3">
+                <th className="px-4 py-3">
                   Projeto / aluno
                 </th>
 
@@ -288,7 +288,7 @@ export function ReportsPage({
                     }
                     className="cursor-pointer transition hover:bg-indigo-50/50"
                   >
-                    <td className="sticky left-0 bg-white px-4 py-4">
+                    <td className="px-4 py-4">
                       <strong className="block font-medium text-slate-800">
                         {projectItem.title}
                       </strong>
