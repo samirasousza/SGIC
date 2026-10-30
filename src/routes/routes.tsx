@@ -9,6 +9,8 @@ import { ProjectsPage } from "../pages/Projects/Projects";
 import { ProjectDetail } from "../pages/Projects/ProjectDetails";
 
 import { AppLayout } from "../components/AppLayout";
+import { ReportsPage } from "../pages/Reports/Reports";
+import { ProjectReportsDetail } from "../pages/Reports/ReportsDetail";
 
 export function AppRoutes() {
   const [role, setRole] = useState<Role>("Aluno");
@@ -58,6 +60,24 @@ export function AppRoutes() {
         element={
           <AppLayout {...layoutProps}>
             <ProjectDetail />
+          </AppLayout>
+        }
+      />
+
+      <Route
+        path="/reports"
+        element={
+          <AppLayout {...layoutProps}>
+            <ReportsPage role={role} accountRole={accountRole} cycle={cycle} />
+          </AppLayout>
+        }
+      />
+
+      <Route
+        path="/projects/:projectId/reports"
+        element={
+          <AppLayout {...layoutProps}>
+            <ProjectReportsDetail role={role} />
           </AppLayout>
         }
       />
