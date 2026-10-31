@@ -65,11 +65,6 @@ export function ProjectEvaluationDetail({ role }: ProjectEvaluationsPageProps) {
     );
   };
 
-  // const backLabel =
-  //   role === "Avaliador"
-  //     ? "Voltar para minhas avaliações"
-  //     : "Voltar para o projeto";
-
   return (
     <>
       <Breadcrumbs

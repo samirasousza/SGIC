@@ -164,15 +164,6 @@ export function ProjectReportsDetail({ role }: ProjectReportsDetailProps) {
         ]}
       />
 
-      <button
-        type="button"
-        onClick={() => navigate(`/projects/${projectId}`)}
-        className="inline-flex items-center gap-2 text-sm font-medium text-indigo-600 hover:text-indigo-800"
-      >
-        <Icon name="arrow" size={16} />
-        Voltar para o projeto
-      </button>
-
       <PageHeader
         title={project.title}
         description={`${project.student} • Orientador: Prof. Dr. ${project.advisor}`}

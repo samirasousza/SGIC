@@ -10,6 +10,7 @@ import { projectRows } from "../Projects/ProjectsData";
 import type { Role } from "../Login/LoginTypes";
 import { BoardStageCard } from "../../components/Evaluaters/BoardStageCard";
 import { ExternalEvaluatorModal } from "../../components/Evaluaters/ExternalEvaluatorModal";
+import { Button } from "../../components/Button";
 
 type Stage = "partial" | "final";
 
@@ -81,12 +82,9 @@ export function EvaluatorsPage({ role }: { role: Role }) {
         <p className="mt-1 text-sm text-slate-500">
           Não foi possível localizar o projeto solicitado.
         </p>
-        <button
-          onClick={() => navigate("/project")}
-          className="mt-4 text-sm font-semibold text-[#143c54] hover:underline"
-        >
+        <Button className="mt-5" onClick={() => navigate("/project")}>
           Voltar para projetos
-        </button>
+        </Button>
       </div>
     );
   }

@@ -9,6 +9,7 @@ import { ProjectDataField } from "../../components/Projects/ProjectDataField";
 import { projectRows } from "./ProjectsData";
 import { Badge } from "../../components/Badge";
 import { PageHeader } from "../../components/PageHeader";
+import { Button } from "../../components/Button";
 
 interface ComplementaryData {
   cpf: string;
@@ -45,15 +46,6 @@ export function ProjectDetail() {
   if (!project) {
     return (
       <div className="space-y-5">
-        <button
-          type="button"
-          onClick={() => navigate("/project")}
-          className="inline-flex items-center gap-2 text-sm font-medium text-indigo-600 transition hover:text-indigo-800"
-        >
-          <Icon name="arrow" size={16} />
-          Voltar para projetos
-        </button>
-
         <Card>
           <div className="py-8 text-center">
             <Icon name="search" size={32} />
@@ -63,6 +55,9 @@ export function ProjectDetail() {
             <p className="mt-2 text-sm text-slate-500">
               Não foi possível encontrar o projeto solicitado.
             </p>
+            <Button className="mt-5" onClick={() => navigate("/project")}>
+              Voltar para projetos
+            </Button>
           </div>
         </Card>
       </div>
@@ -116,21 +111,15 @@ export function ProjectDetail() {
         ]}
       />
 
-      <button
-        type="button"
-        onClick={() => navigate("/project")}
-        className="cursor-pointer inline-flex items-center gap-2 text-sm font-medium text-indigo-600 transition hover:text-indigo-800"
-      >
-        <Icon name="arrow" size={16} />
-        Voltar para projetos
-      </button>
-
       {/* Cabeçalho */}
       <PageHeader
         title={project.title}
         description={`${project.student} • Orientador: Prof. Dr. ${project.advisor}`}
         actions={
-          <Badge tone={archived ? "neutral" : "success"} className={`inline-flex w-fit shrink-0 items-center rounded-full border px-3 py-1 text-xs font-semibold ${statusClass}`}>
+          <Badge
+            tone={archived ? "neutral" : "success"}
+            className={`inline-flex w-fit shrink-0 items-center rounded-full border px-3 py-1 text-xs font-semibold ${statusClass}`}
+          >
             {project.status}
           </Badge>
         }
