@@ -1,5 +1,5 @@
-import { Badge } from "./Badge";
-import { Icon } from "./Icon";
+import { Badge } from "../Badge";
+import { Icon } from "../Icon";
 
 export function EvaluatorPerson({
   index,

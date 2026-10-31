@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { Logo } from "./Logo";
-import { Icon } from "./Icon";
-import { Button } from "./Button";
 import { useNavigate } from "react-router";
+import { Button } from "../Button";
+import { Icon } from "../Icon";
+import { Logo } from "../Logo";
 
 export function LoginForms() {
   const [message, setMessage] = useState("");

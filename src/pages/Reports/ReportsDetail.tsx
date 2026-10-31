@@ -7,11 +7,11 @@ import { projectRows } from "../Projects/ProjectsData";
 import { Breadcrumbs } from "../../components/Breadcrumbs";
 import { Card } from "../../components/Card";
 import { Icon } from "../../components/Icon";
-import { ReportReview } from "../../components/ReportReview";
 import { PageHeader } from "../../components/PageHeader";
 import { Button } from "../../components/Button";
 import { Badge } from "../../components/Badge";
 import { UploadModal } from "../../components/UploadModal";
+import { ReportReview } from "../../components/Reports/ReportReview";
 
 interface ProjectReportsDetailProps {
   role: Role;

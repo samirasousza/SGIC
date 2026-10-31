@@ -1,12 +1,12 @@
-import { Badge } from "./Badge";
-import { Button } from "./Button";
-import { Card } from "./Card";
-import { Data } from "./Data";
+import { evaluatorNames } from "../../pages/Evaluaters/EvaluatorUtils";
+import { Badge } from "../Badge";
+import { Button } from "../Button";
+import { Card } from "../Card";
+import { Data } from "../Data";
+import { Icon } from "../Icon";
+import { SearchableInput } from "../SearchableInput";
 import { EvaluatorPerson } from "./EvaluatorPerson";
-import { Icon } from "./Icon";
-import { SearchableInput } from "./SearchableInput";
 
-import { evaluatorNames } from "../pages/Evaluaters/EvaluatorUtils";
 
 type Stage = "partial" | "final";
 

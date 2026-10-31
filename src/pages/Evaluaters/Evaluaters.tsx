@@ -4,12 +4,12 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Breadcrumbs } from "../../components/Breadcrumbs";
 import { Icon } from "../../components/Icon";
 import { PageHeader } from "../../components/PageHeader";
-import { BoardStageCard } from "../../components/BoardStageCard";
-import { ExternalEvaluatorModal } from "../../components/ExternalEvaluatorModal";
 
 import { isAdvisorRole } from "../Projects/Projects.utils";
 import { projectRows } from "../Projects/ProjectsData";
 import type { Role } from "../Login/LoginTypes";
+import { BoardStageCard } from "../../components/Evaluaters/BoardStageCard";
+import { ExternalEvaluatorModal } from "../../components/Evaluaters/ExternalEvaluatorModal";
 
 type Stage = "partial" | "final";
 

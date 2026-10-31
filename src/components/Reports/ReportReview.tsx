@@ -1,9 +1,9 @@
 import { useState } from "react";
-import type { Role } from "../pages/Login/LoginTypes";
-import { isMentorRole } from "../pages/Projects/Projects.utils";
-import { Icon } from "./Icon";
-import { Badge } from "./Badge";
-import { Button } from "./Button";
+import type { Role } from "../../pages/Login/LoginTypes";
+import { Badge } from "../Badge";
+import { Button } from "../Button";
+import { Icon } from "../Icon";
+import { isMentorRole } from "../../pages/Projects/Projects.utils";
 
 export function ReportReview({
   role,

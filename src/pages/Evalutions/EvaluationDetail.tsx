@@ -7,14 +7,14 @@ import { Card } from "../../components/Card";
 import { Icon } from "../../components/Icon";
 import { PageHeader } from "../../components/PageHeader";
 import { Breadcrumbs } from "../../components/Breadcrumbs";
-import { EvaluationDefenseSummary } from "../../components/EvaluationDefenseSummary";
-import { EvaluationRecords } from "../../components/EvaluationRecords";
-import { SignatureField } from "../../components/SignatureField";
-import { EvaluationFields } from "../../components/EvaluationFields";
 
 import type { Role } from "../Login/LoginTypes";
 import { projectRows } from "../Projects/ProjectsData";
 import { evaluationTitle } from "./EvaluationUtils";
+import { EvaluationDefenseSummary } from "../../components/Evaluations/EvaluationDefenseSummary";
+import { EvaluationRecords } from "../../components/Evaluations/EvaluationRecords";
+import { EvaluationFields } from "../../components/Evaluations/EvaluationFields";
+import { SignatureField } from "../../components/Evaluations/SignatureField";
 
 interface ProjectEvaluationsPageProps {
   role: Role;

@@ -1,9 +1,8 @@
-
-import type { projectRows } from "../pages/Projects/ProjectsData";
-import { Badge } from "./Badge";
-import { Card } from "./Card";
-import { Data } from "./Data";
-import { Icon } from "./Icon";
+import type { projectRows } from "../../pages/Projects/ProjectsData";
+import { Badge } from "../Badge";
+import { Card } from "../Card";
+import { Data } from "../Data";
+import { Icon } from "../Icon";
 
 export function EvaluationDefenseSummary({
   stage,

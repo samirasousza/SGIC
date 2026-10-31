@@ -1,7 +1,7 @@
 
 import { useRef, useState } from "react";
 import type { PointerEvent } from "react";
-import { Icon } from "./Icon";
+import { Icon } from "../Icon";
 
 export function SignatureField({
   onSigned,

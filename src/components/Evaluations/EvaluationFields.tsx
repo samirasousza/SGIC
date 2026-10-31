@@ -1,6 +1,5 @@
-
-import type { Role } from "../pages/Login/LoginTypes";
-import { isAdvisorRole } from "../pages/Projects/Projects.utils";
+import type { Role } from "../../pages/Login/LoginTypes";
+import { isAdvisorRole } from "../../pages/Projects/Projects.utils";
 import { ScoreField } from "./ScoreField";
 
 const fieldClass =

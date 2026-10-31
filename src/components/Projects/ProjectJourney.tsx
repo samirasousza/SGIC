@@ -1,4 +1,5 @@
-import { Icon } from "./Icon";
+import { Icon } from "../Icon";
+
 
 export function ProjectJourney() {
   const steps = [

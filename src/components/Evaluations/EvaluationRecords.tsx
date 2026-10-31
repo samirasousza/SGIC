@@ -1,10 +1,9 @@
-
-import type { Role } from "../pages/Login/LoginTypes";
-import { isAdvisorRole } from "../pages/Projects/Projects.utils";
-import { Badge } from "./Badge";
-import { Button } from "./Button";
-import { Card } from "./Card";
-import { Icon } from "./Icon";
+import type { Role } from "../../pages/Login/LoginTypes";
+import { isAdvisorRole } from "../../pages/Projects/Projects.utils";
+import { Badge } from "../Badge";
+import { Button } from "../Button";
+import { Card } from "../Card";
+import { Icon } from "../Icon";
 
 export function EvaluationRecords({
   role,
