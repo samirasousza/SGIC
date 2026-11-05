@@ -1,21 +1,30 @@
 import { useState } from "react";
-import { useNavigate } from "react-router";
 import { Button } from "../Button";
 import { Icon } from "../Icon";
 import { Logo } from "../Logo";
 
-export function LoginForms() {
-  const [message, setMessage] = useState("");
+interface LoginFormsProps {
+  onSubmit: (credentials: { email: string; password: string }) => Promise<void>;
+}
 
-  const navigate = useNavigate();
+export function LoginForms({ onSubmit }: LoginFormsProps) {
+  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const submit = async (formData: FormData) => {
     setMessage("");
+    setLoading(true);
 
     const email = (formData.get("email") as string)?.trim().toLowerCase() || "";
     const password = (formData.get("password") as string) || "";
 
-    console.log("Autenticado com sucesso:", { email, password });
+    try {
+      await onSubmit({ email, password });
+    } catch (err) {
+      setMessage(err instanceof Error ? err.message : "Erro ao fazer login");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -34,24 +43,8 @@ export function LoginForms() {
         correspondente.
       </p>
 
-      {/* Formulário com Action nativa do React 19 */}
+      {/* Formulário*/}
       <form action={submit} className="flex flex-col gap-3.5">
-        {message && (
-          <div
-            className={`flex items-center gap-2 rounded-lg p-2.5 text-[10px] font-semibold ${
-              message.startsWith("Instruções")
-                ? "bg-green-soft text-green"
-                : "bg-red-soft text-red"
-            }`}
-          >
-            <Icon
-              name={message.startsWith("Instruções") ? "check" : "info"}
-              size={16}
-            />
-            {message}
-          </div>
-        )}
-
         {/* Campo E-mail */}
         <label className="flex flex-col">
           <span className="mb-1.5 text-[10px] font-semibold text-text-main">
@@ -63,6 +56,7 @@ export function LoginForms() {
             placeholder="apoiotecnico@uea.edu.br"
             autoComplete="username"
             required
+            onChange={() => setMessage("")}
             className="h-[43px] w-full rounded-lg border border-line bg-surface px-3 text-[11px] text-ink outline-none transition-all placeholder:text-muted/60 focus:border-blue focus:ring-1 focus:ring-blue-soft"
           />
         </label>
@@ -78,14 +72,31 @@ export function LoginForms() {
             placeholder="Digite sua senha"
             autoComplete="current-password"
             required
+            onChange={() => setMessage("")}
             className="h-[43px] w-full rounded-lg border border-line bg-surface px-3 text-[11px] text-ink outline-none transition-all placeholder:text-muted/60 focus:border-blue focus:ring-1 focus:ring-blue-soft"
           />
         </label>
 
+        {message && (
+          <div
+            className={`flex items-center gap-2 rounded-lg text-[10px] font-semibold ${
+              message.startsWith("Instruções")
+                ? "bg-green-soft text-green"
+                : "bg-red-soft text-red"
+            }`}
+          >
+            <Icon
+              name={message.startsWith("Instruções") ? "check" : "info"}
+              size={16}
+            />
+            {message}
+          </div>
+        )}
+
         {/* Botão de Envio */}
         <div className="mt-1 w-full [&>button]:min-h-[48px] [&>button]:w-full [&>button]:justify-center">
-          <Button type="submit" icon="arrow" onClick={() => navigate("/")}>
-            Entrar
+          <Button type="submit" icon="arrow" disabled={loading}>
+            {loading ? "Entrando..." : "Entrar"}
           </Button>
         </div>
       </form>
