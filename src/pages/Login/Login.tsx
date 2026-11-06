@@ -16,7 +16,7 @@ export function LoginPage() {
       const data = await login(credentials);
 
       localStorage.setItem("authToken", data.token);
-      navigate("/home");
+      navigate("/");
     } catch (err) {
       if (axios.isAxiosError<ApiErrorResponse>(err)) {
         const status = err.response?.status;
