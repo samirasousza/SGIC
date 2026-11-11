@@ -1,43 +1,48 @@
-import { api } from "#/config/apiConfig";
-import { RegisterModel } from "#/modules/auth/models/RegisterModel";
+import { api } from "../config/apiConfig";
 
-const API_URL_LOGIN = `/me`;
-const API_URL_UPDATE_USER = `/me/profile`;
+const API_URL_USER_INFOS = `/me`;
+const API_URL_USER = `/me/profile`;
 
-interface LoginData {
-  login: string;
-  password: string;
+export type UserRole =
+  | "STUDENT"
+  | "ADVISOR"
+  | "EVALUATOR"
+  | "LOCAL_COMMITTEE"
+  | "TECHNICAL_SUPPORT"
+  | "ADMIN";
+
+interface RegisterModel {
+  cpf: string;
+  courseId: string;
+  phone: string;
+  pcd: boolean;
+  hasDegree: boolean;
 }
 
-interface UpdatePasswordData {
-  oldPassword: string;
-  newPassword: string;
+export interface UserModel {
+  id: string;
+  name: string;
+  email: string;
+  cpf: string;
+  phone: string;
+  registration: string;
+  pcd: boolean;
+  hasDegree: boolean;
+  course: {
+    id: string;
+    name: string;
+    unit: { id: string; name: string; acronym: string };
+  };
+  roles: UserRole[];
+  active: boolean;
+  profileCompleted: boolean;
+  mustChangePassword: boolean;
 }
 
-// interface RecoverPasswordData {
-//   email: string;
-// }
-
-export const login = async (loginData: LoginData) => {
-  return (await api.post(API_URL_LOGIN, loginData)).data;
+export const registerStudentInfo = async (registerData: RegisterModel) => {
+  return (await api.put(API_URL_USER, registerData)).data;
 };
 
-export const register = async (registerData: RegisterModel) => {
-  return (await api.put(API_URL_UPDATE_USER, registerData)).data;
+export const userData = async () => {
+  return (await api.get<UserModel>(API_URL_USER_INFOS)).data;
 };
-
-export const updatePassword = async (
-  updatePasswordData: UpdatePasswordData
-) => {
-  return (await api.post(API_URL_UPDATE_PASSWORD, updatePasswordData)).data;
-};
-
-// export const recoverPassword = async (
-//   recoverPasswordData: RecoverPasswordData
-// ) => {
-//   return (await api.post(API_URL_RECOVER_PASSWORD, recoverPasswordData)).data;
-// };
-
-// export const dismissPasswordChange = async () => {
-//   return await api.post("/api/user/dismiss-password-change");
-// };

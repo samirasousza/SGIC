@@ -1,43 +1,118 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
-import { navOptions, profileName, type Role } from "../pages/Login/LoginTypes";
+import { navOptions } from "../pages/Login/LoginTypes";
 
 import { Icon } from "./Icon";
 import { Logo } from "./Logo";
 import { ProfileModal } from "./ProfileModal";
+import { useUser } from "../contexts/userContext";
+import { translateRole } from "../utils/translateRole";
+import type { UserRole } from "../services/userService";
+import { useAppContext } from "../contexts/appContext";
 
 interface SidebarProps {
-  accountRole: Role;
   mobileOpen: boolean;
   setMobileOpen: (open: boolean) => void;
   logout: () => void;
 }
 
-export function Sidebar({
-  accountRole,
-  mobileOpen,
-  setMobileOpen,
-  logout,
-}: SidebarProps) {
+const rolePermissions: Record<UserRole, string[]> = {
+  STUDENT: ["", "project", "reports"],
+
+  ADVISOR: ["", "project", "reports", "evaluations", "evaluators"],
+
+  LOCAL_COMMITTEE: [
+    "",
+    "project",
+    "reports",
+    "evaluations",
+    "evaluators",
+    "spreadsheets",
+  ],
+
+  EVALUATOR: ["evaluations"],
+
+  TECHNICAL_SUPPORT: [
+    "",
+    "project",
+    "reports",
+    "evaluations",
+    "evaluators",
+    "spreadsheets",
+  ],
+
+  ADMIN: [
+    "",
+    "project",
+    "reports",
+    "evaluations",
+    "evaluators",
+    "spreadsheets",
+    "users",
+  ],
+};
+
+export function Sidebar({ mobileOpen, setMobileOpen, logout }: SidebarProps) {
   const [profileOpen, setProfileOpen] = useState(false);
 
-  const name = profileName(accountRole);
   const navigate = useNavigate();
   const location = useLocation();
 
-  const initials = name
-    .split(" ")
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0])
-    .join("")
-    .toUpperCase();
+  const { user } = useUser();
+
+  const userRoles = user?.roles ?? [];
+
+  const { selectedRole } = useAppContext();
+
+  const allowedScreens = selectedRole ? rolePermissions[selectedRole] : [];
+
+  const visibleOptions = navOptions.filter((item) =>
+    allowedScreens.includes(item.screen),
+  );
+
+  // Reúne as permissões de todas as funções do usuário.
+  // const allowedScreens = new Set(
+  //   userRoles.flatMap((role) => rolePermissions[role]),
+  // );
+
+  // Comitê local e administrador acessam projetos da unidade.
+  // const hasUnitProjectAccess = userRoles.some(
+  //   (role) =>
+  //     role === "LOCAL_COMMITTEE" ||
+  //     role === "TECHNICAL_SUPPORT" ||
+  //     role === "ADMIN",
+  // );
+
+  // const visibleOptions = navOptions
+  //   .filter((item) => allowedScreens.has(item.screen))
+  //   .map((item) => ({
+  //     ...item,
+  //     label:
+  //       item.screen === "project"
+  //         ? hasUnitProjectAccess
+  //           ? "Projetos da unidade"
+  //           : "Meus projetos"
+  //         : item.label,
+  //   }));
+
+  function initialsName(name?: string): string {
+    if (!name) return "";
+
+    return name
+      .split(" ")
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((part) => part[0])
+      .join("")
+      .toUpperCase();
+  }
 
   return (
     <>
       {mobileOpen && (
         <button
+          type="button"
           aria-label="Fechar menu"
           onClick={() => setMobileOpen(false)}
           className="fixed inset-0 z-40 bg-slate-950/40 lg:hidden"
@@ -68,15 +143,20 @@ export function Sidebar({
           </p>
 
           <div className="space-y-1">
-            {navOptions.map((item) => {
-              const active = location.pathname === `/${item.screen}`;
+            {visibleOptions.map((item) => {
+              const path = item.screen ? `/${item.screen}` : "/";
+
+              const active =
+                location.pathname === path ||
+                (item.screen !== "" &&
+                  location.pathname.startsWith(`${path}/`));
 
               return (
                 <button
                   key={item.screen}
                   type="button"
                   onClick={() => {
-                    navigate(item.screen ? `/${item.screen}` : "/");
+                    navigate(path);
                     setMobileOpen(false);
                   }}
                   className={`group flex w-full cursor-pointer items-center gap-3 rounded-xl px-3 py-3 text-left text-sm font-medium transition ${
@@ -99,23 +179,27 @@ export function Sidebar({
         </nav>
 
         <div className="border-t border-slate-100 p-4">
-          <div
-            className="mb-4 flex cursor-pointer items-center gap-3 rounded-xl bg-slate-50 p-3"
+          <button
+            type="button"
             onClick={() => setProfileOpen(true)}
+            className="mb-4 flex w-full cursor-pointer items-center gap-3 rounded-xl bg-slate-50 p-3 text-left"
           >
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-sm font-bold text-indigo-700">
-              {initials}
+              {initialsName(user?.name)}
             </div>
 
             <div className="min-w-0">
               <p className="truncate text-sm font-semibold text-slate-800">
-                {name}
+                {user?.name ?? "Usuário"}
               </p>
+
               <p className="truncate text-xs text-slate-500">
-                Perfil principal: {accountRole}
+                {selectedRole
+                  ? translateRole(selectedRole)
+                  : "Sem função vinculada"}
               </p>
             </div>
-          </div>
+          </button>
 
           <button
             type="button"
@@ -128,9 +212,7 @@ export function Sidebar({
         </div>
       </aside>
 
-      {profileOpen && (
-        <ProfileModal role={accountRole} close={() => setProfileOpen(false)} />
-      )}
+      {profileOpen && <ProfileModal close={() => setProfileOpen(false)} />}
     </>
   );
 }

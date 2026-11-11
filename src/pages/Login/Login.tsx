@@ -4,9 +4,11 @@ import { Logo } from "../../components/Logo";
 import { login } from "../../services/authService";
 import axios from "axios";
 import type { ApiErrorResponse } from "../../utils/apiErrorResponse";
+import { useUser } from "../../contexts/userContext";
 
 export function LoginPage() {
   const navigate = useNavigate();
+  const { refreshUser } = useUser();
 
   const handleLogin = async (credentials: {
     email: string;
@@ -16,7 +18,6 @@ export function LoginPage() {
       const data = await login(credentials);
 
       localStorage.setItem("authToken", data.token);
-      navigate("/");
     } catch (err) {
       if (axios.isAxiosError<ApiErrorResponse>(err)) {
         const status = err.response?.status;
@@ -51,6 +52,10 @@ export function LoginPage() {
 
       throw new Error("Erro inesperado. Tente novamente.", { cause: err });
     }
+
+    const me = await refreshUser();
+    if (!me) throw new Error("Não foi possível carregar seu perfil.");
+    navigate(me.mustChangePassword ? "/change-password" : "/");
   };
 
   return (

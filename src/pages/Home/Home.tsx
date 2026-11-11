@@ -2,12 +2,10 @@ import { useNavigate } from "react-router";
 import { Icon } from "../../components/Icon";
 import { Card } from "../../components/Card";
 import { PageHeader } from "../../components/PageHeader";
-import {
-  navByRole,
-  profileName,
-  type Role,
-  type Screen,
-} from "../Login/LoginTypes";
+import { navByRole, type Role, type Screen } from "../Login/LoginTypes";
+import { useUser } from "../../contexts/userContext";
+import { translateRole } from "../../utils/translateRole";
+import { useAppContext } from "../../contexts/appContext";
 
 const homeCardDescriptions: Partial<Record<Screen, string>> = {
   project:
@@ -26,22 +24,35 @@ const homeCardDescriptions: Partial<Record<Screen, string>> = {
     "Configure ciclos, períodos de avaliação, prazos e lembretes automáticos.",
 };
 
-const role: Role = "Aluno";
-const accountRole: Role = "Aluno";
-const cycle = "2025–2026";
-
 export function HomePage() {
   const navigate = useNavigate();
 
-  const destinations = navByRole[role].filter(
-    (item) => item.screen !== "overview",
-  );
+  const { user } = useUser();
+  const { selectedRole, cycle } = useAppContext();
+
+  const role = selectedRole ? (translateRole(selectedRole) as Role) : null;
+
+  const destinations = role
+    ? navByRole[role].filter((item) => item.screen !== "overview")
+    : [];
+
+  // const destinations = [
+  //   ...new Map(
+  //     userRoles
+  //       .flatMap((role) => {
+  //         const translatedRole = translateRole(role) as Role;
+  //         return navByRole[translatedRole] ?? [];
+  //       })
+  //       .filter((item) => item.screen !== "overview")
+  //       .map((item) => [item.screen, item]),
+  //   ).values(),
+  // ];
 
   return (
     <main className="space-y-8">
       <PageHeader
         eyebrow={`Ciclo ${cycle}`}
-        title={`Olá, ${profileName(accountRole)}`}
+        title={`Olá, ${user?.name ?? "usuário"}`}
         description="Escolha uma área para começar. Os acessos abaixo correspondem aos acessos rápidos."
       />
 

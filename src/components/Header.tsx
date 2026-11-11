@@ -1,43 +1,30 @@
-
 import { useState } from "react";
-import type { Role, Screen } from "../pages/Login/LoginTypes";
+import type { Screen } from "../pages/Login/LoginTypes";
 import { Icon } from "./Icon";
 import { NotificationsPanel } from "./NotificationsPanel";
 import { ProfileModal } from "./ProfileModal";
+import { translateRole } from "../utils/translateRole";
+import type { UserRole } from "../services/userService";
+import { useUser } from "../contexts/userContext";
+import { useAppContext } from "../contexts/appContext";
 
 interface HeaderProps {
-  role: Role;
-  accountRole: Role;
-  setRole: (role: Role) => void;
-  screen: Screen;
   setScreen: (screen: Screen) => void;
-  cycle: string;
-  setCycle: (cycle: string) => void;
   setMobileOpen: (open: boolean) => void;
 }
 
-function isAdvisorRole(role: Role) {
-  return role === "Orientador" || role === "Orientador e avaliador";
+function allowsAllCycles(role: UserRole | null) {
+  return role === "ADVISOR" || role === "TECHNICAL_SUPPORT";
 }
 
-export function Header({
-  role,
-  accountRole,
-  setRole,
-  setScreen,
-  cycle,
-  setCycle,
-  setMobileOpen,
-}: HeaderProps) {
+export function Header({ setScreen, setMobileOpen }: HeaderProps) {
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
 
-  const availableViews: Role[] =
-    accountRole === "Orientador e avaliador"
-      ? ["Orientador", "Avaliador"]
-      : accountRole === "Comitê local"
-        ? ["Orientador", "Avaliador", "Comitê local"]
-        : [accountRole];
+  const { user } = useUser();
+  const { cycle, setCycle, selectedRole, setSelectedRole } = useAppContext();
+
+  const availableViews = user?.roles ?? [];
 
   return (
     <>
@@ -67,16 +54,17 @@ export function Header({
             <span className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
               Visão do ciclo
             </span>
+
             <select
               value={cycle}
               onChange={(event) => setCycle(event.target.value)}
               className="max-w-36 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
             >
-              <option>2025–2026</option>
-              <option>2024–2025</option>
-              <option>2023–2024</option>
-              {(isAdvisorRole(role) || role === "Apoio técnico") && (
-                <option>Todos os ciclos</option>
+              <option value="2025/2026">2025/2026</option>
+              <option value="2024/2025">2024/2025</option>
+
+              {allowsAllCycles(selectedRole) && (
+                <option value="all">Todos os ciclos</option>
               )}
             </select>
           </label>
@@ -86,17 +74,18 @@ export function Header({
               <span className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
                 Visualização
               </span>
+
               <select
-                value={role}
+                value={selectedRole ?? ""}
                 onChange={(event) => {
-                  setRole(event.target.value as Role);
+                  setSelectedRole(event.target.value as UserRole);
                   setScreen("overview");
                 }}
                 className="max-w-44 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
               >
                 {availableViews.map((view) => (
                   <option key={view} value={view}>
-                    {view}
+                    {translateRole(view)}
                   </option>
                 ))}
               </select>
@@ -107,7 +96,7 @@ export function Header({
             type="button"
             aria-label="Notificações"
             onClick={() => setNotificationsOpen(true)}
-            className="cursor-pointer relative rounded-xl p-2.5 text-slate-600 transition hover:bg-slate-100 hover:text-indigo-600"
+            className="relative cursor-pointer rounded-xl p-2.5 text-slate-600 transition hover:bg-slate-100 hover:text-indigo-600"
           >
             <Icon name="bell" size={20} />
             <span className="absolute right-2 top-2 h-2 w-2 rounded-full border-2 border-white bg-red-500" />
@@ -117,7 +106,7 @@ export function Header({
             type="button"
             aria-label="Abrir perfil"
             onClick={() => setProfileOpen(true)}
-            className="cursor-pointer flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-slate-50 text-slate-600 transition hover:border-indigo-200 hover:bg-indigo-50 hover:text-indigo-700"
+            className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-slate-200 bg-slate-50 text-slate-600 transition hover:border-indigo-200 hover:bg-indigo-50 hover:text-indigo-700"
           >
             <Icon name="user" size={19} />
           </button>
@@ -134,12 +123,7 @@ export function Header({
         />
       )}
 
-      {profileOpen && (
-        <ProfileModal
-          role={accountRole}
-          close={() => setProfileOpen(false)}
-        />
-      )}
+      {profileOpen && <ProfileModal close={() => setProfileOpen(false)} />}
     </>
   );
 }

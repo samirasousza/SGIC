@@ -1,47 +1,38 @@
-
 import { Icon } from "./Icon";
-import {
-  profileName,
-  type Role,
-} from "../pages/Login/LoginTypes";
+import { useUser } from "../contexts/userContext";
+import { formatCpf } from "../utils/formatCpf";
+import { formatPhone } from "../utils/formatPhone";
+import { translateRole } from "../utils/translateRole";
 
 interface ProfileModalProps {
-  role: Role;
   close: () => void;
 }
 
-function profilesForRole(role: Role): Role[] {
-  if (role === "Orientador e avaliador") {
-    return ["Orientador", "Avaliador"];
-  }
+export function ProfileModal({ close }: ProfileModalProps) {
+  const { user, loading, error, refreshUser } = useUser();
 
-  if (role === "Comitê local") {
-    return ["Orientador", "Avaliador", "Comitê local"];
-  }
-
-  return [role];
-}
-
-export function ProfileModal({ role, close }: ProfileModalProps) {
-  const isStudent = role === "Aluno";
-  const profiles = profilesForRole(role);
-  const name = profileName(role)
-    .replace("Prof. ", "")
-    .replace("Profa. ", "");
+  const isStudent = user?.roles.includes("STUDENT");
 
   const data = [
-    { label: "Nome completo", value: name },
-    {
-      label: "E-mail institucional",
-      value: isStudent
-        ? "samira@aluno.uea.edu.br"
-        : "usuario@uea.edu.br",
-    },
-    {
-      label: isStudent ? "Matrícula" : "Número institucional",
-      value: isStudent ? "22150184" : "009842",
-    },
-    { label: "CPF", value: "123.482.769-09" },
+    { label: "Nome completo", value: user?.name || "—" },
+    { label: "E-mail institucional", value: user?.email || "—" },
+    { label: "CPF", value: formatCpf(user?.cpf) },
+    { label: "Telefone", value: formatPhone(user?.phone) },
+    ...(isStudent
+      ? [
+          {
+            label: "Matrícula",
+            value: user?.registration || "—",
+          },
+          { label: "Curso", value: user?.course?.name || "—" },
+          {
+            label: "Unidade",
+            value: user?.course?.unit
+              ? `${user.course.unit.acronym} - ${user.course.unit.name}`
+              : "—",
+          },
+        ]
+      : []),
   ];
 
   return (
@@ -83,21 +74,43 @@ export function ProfileModal({ role, close }: ProfileModalProps) {
         </div>
 
         <div className="space-y-6 p-6">
-          <div className="grid gap-4 sm:grid-cols-2">
-            {data.map((item) => (
-              <div
-                key={item.label}
-                className="rounded-xl border border-slate-100 bg-slate-50 p-4"
+          {loading && !user ? (
+            <div className="grid gap-4 sm:grid-cols-2" aria-busy="true">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="h-[74px] animate-pulse rounded-xl border border-slate-100 bg-slate-100"
+                />
+              ))}
+            </div>
+          ) : error && !user ? (
+            <div className="rounded-xl border border-red-100 bg-red-50 p-4 text-sm text-red-700">
+              <p>{error}</p>
+              <button
+                type="button"
+                onClick={() => refreshUser()}
+                className="mt-2 font-semibold underline"
               >
-                <p className="text-xs font-medium text-slate-500">
-                  {item.label}
-                </p>
-                <p className="mt-1 break-words text-sm font-semibold text-slate-800">
-                  {item.value}
-                </p>
-              </div>
-            ))}
-          </div>
+                Tentar novamente
+              </button>
+            </div>
+          ) : (
+            <div className="grid gap-4 sm:grid-cols-2">
+              {data.map((item) => (
+                <div
+                  key={item.label}
+                  className="rounded-xl border border-slate-100 bg-slate-50 p-4"
+                >
+                  <p className="text-xs font-medium text-slate-500">
+                    {item.label}
+                  </p>
+                  <p className="mt-1 break-words text-sm font-semibold text-slate-800">
+                    {item.value}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
 
           <div>
             <h3 className="text-sm font-semibold text-slate-800">
@@ -105,22 +118,23 @@ export function ProfileModal({ role, close }: ProfileModalProps) {
             </h3>
 
             <div className="mt-3 flex flex-wrap gap-2">
-              {profiles.map((profile) => (
+              {user?.roles.map((role) => (
                 <span
-                  key={profile}
+                  key={role}
                   className={`rounded-full px-3 py-1.5 text-xs font-semibold ${
-                    profile === role
+                    role
                       ? "bg-indigo-100 text-indigo-700"
                       : "bg-slate-100 text-slate-600"
                   }`}
                 >
-                  {profile}
+                  {translateRole(role)}
                 </span>
               ))}
             </div>
 
             <p className="mt-3 text-xs text-slate-500">
-              Perfil principal no acesso: {role}
+              Perfil principal no acesso:{" "}
+              {user?.roles[0] ? translateRole(user.roles[0]) : "Não definido"}
             </p>
           </div>
         </div>
@@ -129,7 +143,7 @@ export function ProfileModal({ role, close }: ProfileModalProps) {
           <button
             type="button"
             onClick={close}
-            className="rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:ring-offset-2"
+            className="cursor-pointer rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:ring-offset-2"
           >
             Fechar
           </button>

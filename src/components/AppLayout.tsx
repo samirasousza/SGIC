@@ -16,13 +16,7 @@ interface AppLayoutProps {
 }
 
 export function AppLayout({
-  role,
-  accountRole,
-  setRole,
-  screen,
   setScreen,
-  cycle,
-  setCycle,
   logout,
   children,
 }: AppLayoutProps) {
@@ -31,7 +25,6 @@ export function AppLayout({
   return (
     <div className="min-h-screen bg-slate-50">
       <Sidebar
-        accountRole={accountRole}
         mobileOpen={mobileOpen}
         setMobileOpen={setMobileOpen}
         logout={logout}
@@ -39,13 +32,7 @@ export function AppLayout({
 
       <div className="min-h-screen lg:pl-72">
         <Header
-          role={role}
-          accountRole={accountRole}
-          setRole={setRole}
-          screen={screen}
           setScreen={setScreen}
-          cycle={cycle}
-          setCycle={setCycle}
           setMobileOpen={setMobileOpen}
         />
 
