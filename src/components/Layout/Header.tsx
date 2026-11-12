@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Icon } from "./Icon";
-import { NotificationsPanel } from "./NotificationsPanel";
-import { ProfileModal } from "./ProfileModal";
-import { translateRole } from "../utils/translateRole";
-import { useUser } from "../contexts/userContext";
-import { useAppContext } from "../contexts/appContext";
-import type { UserRole } from "../types/userRoleType";
+import { NotificationsPanel } from "../NotificationsPanel";
+import { ProfileModal } from "../ProfileModal";
+import { translateRole } from "../../utils/translateRole";
+import { useUser } from "../../contexts/userContext";
+import { useAppContext } from "../../contexts/appContext";
+import type { UserRole } from "../../types/userRoleType";
+import { Icon } from "../Icon";
 
 interface HeaderProps {
   setMobileOpen: (open: boolean) => void;

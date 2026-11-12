@@ -1,4 +1,3 @@
-
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -17,12 +16,10 @@ import {
   RegisterProjectBoard,
 } from "../../services/projectService";
 
-import { getTeachers} from "../../services/userService";
+import { getTeachers } from "../../services/userService";
 
 import type { ProjectDetailsModel } from "../../models/projectModel";
-import type {
-  ProjectBoardMemberModel,
-} from "../../models/projectBoardModel";
+import type { ProjectBoardMemberModel } from "../../models/projectBoardModel";
 import type { DefenseType } from "../../types/defenseType";
 import type { TeacherModel } from "../../models/userModel";
 
@@ -56,16 +53,11 @@ function getStage(defenseType: DefenseType): Stage {
   return defenseType === "PARTIAL" ? "partial" : "final";
 }
 
-function getEvaluatorLabel(evaluator: {
-  name: string;
-  email: string;
-}) {
+function getEvaluatorLabel(evaluator: { name: string; email: string }) {
   return `${evaluator.name} (${evaluator.email})`;
 }
 
-function mapBoardsToState(
-  members: ProjectBoardMemberModel[],
-): BoardsState {
+function mapBoardsToState(members: ProjectBoardMemberModel[]): BoardsState {
   const result: BoardsState = {
     partial: { ...initialBoard },
     final: { ...initialBoard },
@@ -143,12 +135,10 @@ export function EvaluatorsPage() {
   }, [loadData]);
 
   const isCommittee =
-    selectedRole === "LOCAL_COMMITTEE" ||
-    selectedRole === "TECHNICAL_SUPPORT";
+    selectedRole === "LOCAL_COMMITTEE" || selectedRole === "TECHNICAL_SUPPORT";
 
-  const canSuggest =
-    selectedRole === "ADVISOR" 
-    // || selectedRole === "COADVISOR";
+  const canSuggest = selectedRole === "ADVISOR";
+  // || selectedRole === "COADVISOR";
 
   const canDefine = isCommittee;
 
@@ -159,11 +149,7 @@ export function EvaluatorsPage() {
     ]),
   ];
 
-  function updateBoard(
-    stage: Stage,
-    field: keyof BoardForm,
-    value: string,
-  ) {
+  function updateBoard(stage: Stage, field: keyof BoardForm, value: string) {
     setBoards((current) => ({
       ...current,
       [stage]: {
@@ -178,9 +164,7 @@ export function EvaluatorsPage() {
     memberType: "INTERNAL" | "EXTERNAL",
     stage: Stage,
   ): string | undefined {
-    const teacher = teachers.find(
-      (item) => getEvaluatorLabel(item) === label,
-    );
+    const teacher = teachers.find((item) => getEvaluatorLabel(item) === label);
 
     if (teacher) return teacher.id;
 
@@ -199,11 +183,7 @@ export function EvaluatorsPage() {
 
     const board = boards[stage];
 
-    const internalEvaluatorId = findEvaluatorId(
-      board.first,
-      "INTERNAL",
-      stage,
-    );
+    const internalEvaluatorId = findEvaluatorId(board.first, "INTERNAL", stage);
 
     const externalEvaluatorId = findEvaluatorId(
       board.second,
@@ -378,8 +358,15 @@ export function EvaluatorsPage() {
       {externalOpen && (
         <ExternalEvaluatorModal
           close={() => setExternalOpen(false)}
-          submit={() => setExternalOpen(false)}
+          submit={(data) => {
+            console.log("Solicitação de avaliador externo:", data);
+            setExternalOpen(false);
+          }}
         />
+        // <ExternalEvaluatorModal
+        //   close={() => setExternalOpen(false)}
+        //   submit={() => setExternalOpen(false)}
+        // />
       )}
 
       {saving && (

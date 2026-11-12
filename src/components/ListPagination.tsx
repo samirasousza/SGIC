@@ -31,7 +31,7 @@ export function ListPagination({
             type="button"
             disabled={page === 1}
             onClick={() => onPageChange(page - 1)}
-            className={`${buttonClass} border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40`}
+            className={`${buttonClass} cursor-pointer border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40`}
           >
             Anterior
           </button>
@@ -48,8 +48,8 @@ export function ListPagination({
                 onClick={() => onPageChange(pageNumber)}
                 className={`${buttonClass} ${
                   isCurrent
-                    ? "border-indigo-600 bg-indigo-600 text-white"
-                    : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                    ? "cursor-pointer border-indigo-600 bg-indigo-600 text-white"
+                    : "cursor-pointer border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
                 }`}
               >
                 {pageNumber}
@@ -61,7 +61,7 @@ export function ListPagination({
             type="button"
             disabled={page === totalPages}
             onClick={() => onPageChange(page + 1)}
-            className={`${buttonClass} border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40`}
+            className={`${buttonClass} cursor-pointer border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40`}
           >
             Próxima
           </button>

@@ -12,7 +12,7 @@ import type {
 const API_URL_USER = "/users";
 const API_URL_TEACHERS = "/users/teachers";
 
-export const roleUpdate = async (
+export const updateUserRoles = async (
   id: string,
   data: UpdateUserRolesModel,
 ): Promise<UserModel> => {
@@ -25,7 +25,7 @@ export const getAllUsers = async (
   return (await api.get<PaginatedUsersModel>(API_URL_USER, { params })).data;
 };
 
-export const RegisterUser = async (
+export const registerUser = async (
   data: RegisterUserModel,
 ): Promise<RegisterUserResponse> => {
   return (await api.post<RegisterUserResponse>(API_URL_USER, data)).data;

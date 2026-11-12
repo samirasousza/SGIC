@@ -11,21 +11,19 @@ import { LoginPage } from "../pages/Login/Login";
 import { HomePage } from "../pages/Home/Home";
 import { ProjectsPage } from "../pages/Projects/Projects";
 import { ProjectDetail } from "../pages/Projects/ProjectDetails";
-
-import { AppLayout } from "../components/AppLayout";
-// import { ReportsPage } from "../pages/Reports/Reports";
-// import { ProjectReportsDetail } from "../pages/Reports/ReportsDetail";
-// import { EvaluationsPage } from "../pages/Evalutions/Evaluations";
-// import { ProjectEvaluationDetail } from "../pages/Evalutions/EvaluationDetail";
 import { EvaluatorsPage } from "../pages/Evaluaters/Evaluaters";
-// import { SpreadsheetsPage } from "../pages/Spreadsheets/Spreadsheets";
+
+
 import { useUser } from "../contexts/userContext";
 import { clearSession } from "../config/apiConfig";
 import { CompleteStudentProfile } from "../pages/UserProfile/CompleteUserProfile";
 import { ChangePasswordPage } from "../pages/ChangePassword/ChangePassword";
-
-// Definidos FORA do AppRoutes: se ficarem dentro, o React recria o componente
-// a cada render e toda a árvore de rotas é desmontada/remontada.
+import { AppLayout } from "../components/Layout/AppLayout";
+import { UsersPage } from "../pages/Users/Users";
+import { UserAddPage } from "../pages/Users/RegisterUsers";
+// import { UserEditPage } from "../pages/Users/EditUsers";
+import { PendingUsersPage } from "../pages/Users/PedingUsers";
+import { SettingsPage } from "../pages/Settings/Settings";
 
 function ScreenLoading() {
   return (
@@ -33,7 +31,7 @@ function ScreenLoading() {
   );
 }
 
-// Só deixa passar quem está autenticado
+// Só permite a entrada de usuários autenticados.
 function ProtectedRoute() {
   const { user, loading, refreshUser, clearUser } = useUser();
   const navigate = useNavigate();
@@ -71,7 +69,22 @@ function ProtectedRoute() {
   );
 }
 
-// Quem já está logado não precisa ver a tela de login
+// Só permite a entrada de usuários administradores.
+function AdminRoute() {
+  const { user } = useUser();
+
+  if (!user) return <Navigate to="/login" replace />;
+
+  const isAdmin = user.roles.includes("ADMIN");
+
+  if (!isAdmin) {
+    return <Navigate to="/" replace />;
+  }
+
+  return <Outlet />;
+}
+
+// Quem já está logado não precisa ver a tela de login.
 function PublicOnlyRoute() {
   const { user, loading } = useUser();
 
@@ -85,14 +98,9 @@ export function AppRoutes() {
   const navigate = useNavigate();
   const { clearUser } = useUser();
 
-  // const [role, setRole] = useState<UserRole>("");
-  // const [screen, setScreen] = useState<Screen>("overview");
-  // const [accountRole] = useState<UserRole>("");
-  // const [cycle, setCycle] = useState("2025–2026");
-
   function logout() {
-    clearSession(); // remove token e flags de sessão
-    clearUser(); // zera o usuário no contexto
+    clearSession();
+    clearUser();
     navigate("/login", { replace: true });
   }
 
@@ -107,7 +115,7 @@ export function AppRoutes() {
         <Route path="/login" element={<LoginPage />} />
       </Route>
 
-      {/* Rotas protegidas, todas dentro do mesmo layout */}
+      {/* Rotas protegidas */}
       <Route element={<ProtectedRoute />}>
         <Route
           element={
@@ -118,42 +126,22 @@ export function AppRoutes() {
         >
           <Route path="/" element={<HomePage />} />
           <Route path="/change-password" element={<ChangePasswordPage />} />
+
           <Route path="/projects" element={<ProjectsPage />} />
           <Route path="/projects/:projectId" element={<ProjectDetail />} />
-
-          {/* <Route
-            path="/reports"
-            element={
-              <ReportsPage
-                role={role}
-                accountRole={accountRole}
-                cycle={cycle}
-              />
-            }
-          />
-          <Route
-            path="/projects/:projectId/reports"
-            element={<ProjectReportsDetail role={role} />}
-          />
-
-          <Route
-            path="/evaluations"
-            element={<EvaluationsPage cycle={cycle} />}
-          />
-          <Route
-            path="/projects/:projectId/evaluations"
-            element={<ProjectEvaluationDetail role={role} />}
-          /> */}
           <Route
             path="/projects/:projectId/evaluators"
             element={<EvaluatorsPage />}
           />
 
-          {/* <Route
-            path="/spreadsheets"
-            element={<SpreadsheetsPage role={role} cycle={cycle} />}
-          /> */}
-         
+          {/* Rotas administrativas: somente ADMIN */}
+          <Route element={<AdminRoute />}>
+            <Route path="/users" element={<UsersPage />} />
+            <Route path="/user-add" element={<UserAddPage />} />
+            {/* <Route path="/user-edit/:id" element={<UserEditPage />} /> */}
+            <Route path="/pending-users" element={<PendingUsersPage />} />
+            <Route path="/settings" element={<SettingsPage />} />
+          </Route>
         </Route>
       </Route>
 

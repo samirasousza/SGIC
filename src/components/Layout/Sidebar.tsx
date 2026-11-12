@@ -1,15 +1,15 @@
 import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
-import { Icon } from "./Icon";
-import { Logo } from "./Logo";
-import { ProfileModal } from "./ProfileModal";
+import { Icon } from "../Icon";
+import { Logo } from "../Logo";
+import { ProfileModal } from "../ProfileModal";
 
-import { useUser } from "../contexts/userContext";
-import { useAppContext } from "../contexts/appContext";
-import { translateRole } from "../utils/translateRole";
-import type { UserRole } from "../types/userRoleType";
-import { getNavigationOptions, getScreenPath } from "../utils/navigation";
+import { useUser } from "../../contexts/userContext";
+import { useAppContext } from "../../contexts/appContext";
+import { translateRole } from "../../utils/translateRole";
+import type { UserRole } from "../../types/userRoleType";
+import { getNavigationOptions, getScreenPath } from "../../utils/navigation";
 
 interface SidebarProps {
   mobileOpen: boolean;
