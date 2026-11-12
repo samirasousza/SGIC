@@ -1,4 +1,3 @@
-import { evaluatorNames } from "../../pages/Evaluaters/EvaluatorUtils";
 import { Badge } from "../Badge";
 import { Button } from "../Button";
 import { Card } from "../Card";
@@ -6,7 +5,6 @@ import { Data } from "../Data";
 import { Icon } from "../Icon";
 import { SearchableInput } from "../SearchableInput";
 import { EvaluatorPerson } from "./EvaluatorPerson";
-
 
 type Stage = "partial" | "final";
 
@@ -27,10 +25,12 @@ export function BoardStageCard({
   canDefine,
   archived,
   locked,
+  evaluatorOptions,
   onChange,
   onEdit,
   onCancel,
   onSave,
+  // onApprove,
   onExternal,
 }: {
   stage: Stage;
@@ -40,11 +40,12 @@ export function BoardStageCard({
   canDefine: boolean;
   archived: boolean;
   locked: boolean;
+  evaluatorOptions: string[];
   onChange: (field: keyof Board, value: string) => void;
   onEdit: () => void;
   onCancel: () => void;
   onSave: () => void;
-  onApprove: () => void;
+  // onApprove: () => void;
   onExternal: () => void;
 }) {
   const title = stage === "partial" ? "Defesa parcial" : "Defesa final";
@@ -91,15 +92,6 @@ export function BoardStageCard({
 
           <h2 className="mt-3 text-lg font-semibold text-slate-800">{title}</h2>
 
-          {/* <p className="mt-1 text-sm leading-relaxed text-slate-500">
-            {archived
-              ? "Composição registrada no ciclo encerrado."
-              : canDefine
-                ? board.status === "Definida"
-                  ? "Banca aprovada. Os dados ainda podem ser alterados."
-                  : "Sugestão do orientador pronta para revisão ou aprovação."
-                : "Data e composição propostas ao comitê local."}
-          </p> */}
           <p className="mt-1 text-sm leading-relaxed text-slate-500">
             {archived
               ? "Composição registrada no ciclo encerrado."
@@ -115,19 +107,6 @@ export function BoardStageCard({
           </p>
         </div>
 
-        {/* {canEdit && !editing && (
-          <div className="flex flex-wrap gap-2">
-            <Button variant="secondary" icon="users" onClick={onEdit}>
-              {canDefine ? "Revisar dados" : "Editar sugestão"}
-            </Button>
-
-            {canDefine && board.status !== "Definida" && (
-              <Button icon="check" onClick={onApprove}>
-                Aprovar banca
-              </Button>
-            )}
-          </div>
-        )} */}
         {canEdit && !editing && (
           <div className="flex flex-wrap gap-2">
             <Button variant="secondary" icon="users" onClick={onEdit}>
@@ -135,9 +114,6 @@ export function BoardStageCard({
             </Button>
 
             {canDefine && board.status === "Sugerida" && (
-              //   <Button icon="check" onClick={onApprove}>
-              //     Aprovar banca
-              //   </Button>
               <Button
                 icon="check"
                 disabled={
@@ -206,14 +182,14 @@ export function BoardStageCard({
               label="Avaliador interno"
               value={board.first}
               onChange={(value) => onChange("first", value)}
-              options={evaluatorNames}
+              options={evaluatorOptions}
             />
 
             <SearchableInput
               label="Avaliador externo"
               value={board.second}
               onChange={(value) => onChange("second", value)}
-              options={evaluatorNames}
+              options={evaluatorOptions}
             />
           </div>
 
@@ -244,30 +220,6 @@ export function BoardStageCard({
           </div>
         </div>
       ) : (
-        // <div className="space-y-4 p-5">
-        //   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        //     <Data
-        //       label="Data e horário"
-        //       value={`${board.date.split("-").reverse().join("/")} às ${board.time}`}
-        //     />
-
-        //     <Data
-        //       label="Local"
-        //       value={board.location || "On-line • link a definir"}
-        //     />
-        //   </div>
-
-        //   <div className="border-t border-slate-100 pt-4">
-        //     <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-400">
-        //       Composição da banca
-        //     </p>
-
-        //     <div className="space-y-3">
-        //       <EvaluatorPerson index="01" name={board.first} />
-        //       <EvaluatorPerson index="02" name={board.second} />
-        //     </div>
-        //   </div>
-        // </div>
         <div className="space-y-4 p-5">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Data

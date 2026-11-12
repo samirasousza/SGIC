@@ -1,4 +1,4 @@
-import type { UserRole } from "../services/userService";
+import type { UserRole } from "../services/loggedUserService";
 
 export const translateRole = (role: UserRole): string => {
   const roles: Record<UserRole, string> = {

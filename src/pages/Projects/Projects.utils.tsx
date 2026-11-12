@@ -1,4 +1,3 @@
-
 import type { UserRole } from "../../types/userRoleType";
 
 export function isAdvisorRole(role: UserRole | null) {
@@ -6,5 +5,6 @@ export function isAdvisorRole(role: UserRole | null) {
 }
 
 export function isMentorRole(role: UserRole | null) {
-  return role === "ADVISOR" || role === "COADVISOR";
+  return role === "ADVISOR";
+  // || role === "COADVISOR";
 }

@@ -1,7 +1,7 @@
 export type UserRole =
   | "STUDENT"
   | "ADVISOR"
-  | "COADVISOR"
+  // | "COADVISOR"
   | "EVALUATOR"
   | "LOCAL_COMMITTEE"
   | "TECHNICAL_SUPPORT"

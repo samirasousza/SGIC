@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
 
-import { registerStudentInfo } from "../../services/userService";
+import { registerStudentInfo } from "../../services/loggedUserService";
 import type { UserInfosUpdateModel } from "../../models/userModel";
 import type { CourseModel } from "../../models/projectModel";
 import { GetAllCourses } from "../../services/coursesService";

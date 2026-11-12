@@ -17,7 +17,7 @@ import { AppLayout } from "../components/AppLayout";
 // import { ProjectReportsDetail } from "../pages/Reports/ReportsDetail";
 // import { EvaluationsPage } from "../pages/Evalutions/Evaluations";
 // import { ProjectEvaluationDetail } from "../pages/Evalutions/EvaluationDetail";
-// import { EvaluatorsPage } from "../pages/Evaluaters/Evaluaters";
+import { EvaluatorsPage } from "../pages/Evaluaters/Evaluaters";
 // import { SpreadsheetsPage } from "../pages/Spreadsheets/Spreadsheets";
 import { useUser } from "../contexts/userContext";
 import { clearSession } from "../config/apiConfig";
@@ -143,17 +143,17 @@ export function AppRoutes() {
           <Route
             path="/projects/:projectId/evaluations"
             element={<ProjectEvaluationDetail role={role} />}
-          />
+          /> */}
           <Route
             path="/projects/:projectId/evaluators"
-            element={<EvaluatorsPage role={role} />}
+            element={<EvaluatorsPage />}
           />
 
-          <Route
+          {/* <Route
             path="/spreadsheets"
             element={<SpreadsheetsPage role={role} cycle={cycle} />}
-          />
-          */}
+          /> */}
+         
         </Route>
       </Route>
 

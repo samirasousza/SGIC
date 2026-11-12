@@ -22,13 +22,13 @@ export const navigationByRole: Record<UserRole, NavigationOption[]> = {
     { screen: "evaluators", label: "Avaliadores", icon: "users" },
   ],
 
-  COADVISOR: [
-    { screen: "", label: "Início", icon: "home" },
-    { screen: "projects", label: "Meus projetos", icon: "folder" },
-    { screen: "reports", label: "Relatórios", icon: "file-text" },
-    { screen: "evaluations", label: "Avaliações", icon: "clipboard-check" },
-    { screen: "evaluators", label: "Avaliadores", icon: "users" },
-  ],
+  // COADVISOR: [
+  //   { screen: "", label: "Início", icon: "home" },
+  //   { screen: "projects", label: "Meus projetos", icon: "folder" },
+  //   { screen: "reports", label: "Relatórios", icon: "file-text" },
+  //   { screen: "evaluations", label: "Avaliações", icon: "clipboard-check" },
+  //   { screen: "evaluators", label: "Avaliadores", icon: "users" },
+  // ],
 
   EVALUATOR: [
     { screen: "", label: "Início", icon: "home" },
