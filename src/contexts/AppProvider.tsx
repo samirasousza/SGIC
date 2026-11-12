@@ -1,6 +1,5 @@
-
 import { useState, type ReactNode } from "react";
-import type { UserRole } from "../services/userService";
+import type { UserRole } from "../types/userRoleType";
 import { useUser } from "./userContext";
 import { AppContext } from "./appContext";
 
@@ -17,7 +16,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
       ? roleState
       : (userRoles[0] ?? null);
 
-  function setSelectedRole(role: UserRole) {
+  function setSelectedRole(role: UserRole | null) {
+    if (role === null) {
+      setRoleState(null);
+      return;
+    }
+
     if (userRoles.includes(role)) {
       setRoleState(role);
     }

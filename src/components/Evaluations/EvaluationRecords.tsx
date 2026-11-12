@@ -1,5 +1,5 @@
-import type { Role } from "../../pages/Login/LoginTypes";
 import { isAdvisorRole } from "../../pages/Projects/Projects.utils";
+import type { UserRole } from "../../types/userRoleType";
 import { Badge } from "../Badge";
 import { Button } from "../Button";
 import { Card } from "../Card";
@@ -10,7 +10,7 @@ export function EvaluationRecords({
   stage,
   archived = false,
 }: {
-  role: Role;
+  role: UserRole;
   stage: "Parcial" | "Final";
   archived?: boolean;
 }) {
@@ -34,13 +34,13 @@ export function EvaluationRecords({
   ];
 
   const roleRecords =
-    role === "Comitê local" ||
-    role === "Apoio técnico" ||
-    role === "Administrador"
+    role === "LOCAL_COMMITTEE" ||
+    role === "TECHNICAL_SUPPORT" ||
+    role === "ADMIN"
       ? all
       : isAdvisorRole(role)
         ? all.slice(1)
-        : role === "Avaliador"
+        : role === "EVALUATOR"
           ? [all[2]]
           : [all[0]];
 
@@ -63,9 +63,9 @@ export function EvaluationRecords({
         </h2>
 
         <p className="mt-1 text-sm text-slate-500">
-          {role === "Comitê local" ||
-          role === "Apoio técnico" ||
-          role === "Administrador"
+          {role === "LOCAL_COMMITTEE" ||
+          role === "TECHNICAL_SUPPORT" ||
+          role === "ADMIN"
             ? "Todas as avaliações vinculadas ao projeto."
             : isAdvisorRole(role)
               ? "Sua avaliação e as avaliações dos membros."

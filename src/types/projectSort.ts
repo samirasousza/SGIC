@@ -1,0 +1,1 @@
+export type ProjectSort = "TITLE" | "STUDENT" | "ADVISOR" | "START_DATE";

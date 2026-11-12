@@ -2,9 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import {
   registerStudentInfo,
-  userData,
-  type UserModel,
-  type UserRole,
+  userData
 } from "../services/userService";
 
 import {
@@ -12,6 +10,8 @@ import {
   type UserContextData,
   type UserProviderProps,
 } from "./userContext";
+import type { UserModel } from "../models/userModel";
+import type { UserRole } from "../types/userRoleType";
 
 type RegisterData = Parameters<typeof registerStudentInfo>[0];
 

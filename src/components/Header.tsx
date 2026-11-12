@@ -1,15 +1,14 @@
 import { useState } from "react";
-import type { Screen } from "../pages/Login/LoginTypes";
+import { useNavigate } from "react-router-dom";
 import { Icon } from "./Icon";
 import { NotificationsPanel } from "./NotificationsPanel";
 import { ProfileModal } from "./ProfileModal";
 import { translateRole } from "../utils/translateRole";
-import type { UserRole } from "../services/userService";
 import { useUser } from "../contexts/userContext";
 import { useAppContext } from "../contexts/appContext";
+import type { UserRole } from "../types/userRoleType";
 
 interface HeaderProps {
-  setScreen: (screen: Screen) => void;
   setMobileOpen: (open: boolean) => void;
 }
 
@@ -17,14 +16,21 @@ function allowsAllCycles(role: UserRole | null) {
   return role === "ADVISOR" || role === "TECHNICAL_SUPPORT";
 }
 
-export function Header({ setScreen, setMobileOpen }: HeaderProps) {
+export function Header({ setMobileOpen }: HeaderProps) {
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+
+  const navigate = useNavigate();
 
   const { user } = useUser();
   const { cycle, setCycle, selectedRole, setSelectedRole } = useAppContext();
 
   const availableViews = user?.roles ?? [];
+
+  function handleRoleChange(role: UserRole) {
+    setSelectedRole(role);
+    navigate("/");
+  }
 
   return (
     <>
@@ -43,6 +49,7 @@ export function Header({ setScreen, setMobileOpen }: HeaderProps) {
             <h1 className="truncate text-sm font-semibold text-slate-800 sm:text-base">
               Sistema de Gerenciamento de Iniciação Científica
             </h1>
+
             <p className="hidden text-xs text-slate-500 sm:block">
               Universidade do Estado do Amazonas — UEA
             </p>
@@ -77,10 +84,9 @@ export function Header({ setScreen, setMobileOpen }: HeaderProps) {
 
               <select
                 value={selectedRole ?? ""}
-                onChange={(event) => {
-                  setSelectedRole(event.target.value as UserRole);
-                  setScreen("overview");
-                }}
+                onChange={(event) =>
+                  handleRoleChange(event.target.value as UserRole)
+                }
                 className="max-w-44 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
               >
                 {availableViews.map((view) => (
@@ -118,7 +124,7 @@ export function Header({ setScreen, setMobileOpen }: HeaderProps) {
           close={() => setNotificationsOpen(false)}
           navigate={(next) => {
             setNotificationsOpen(false);
-            setScreen(next);
+            navigate(next === "" || next === "overview" ? "/" : `/${next}`);
           }}
         />
       )}

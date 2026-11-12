@@ -1,12 +1,12 @@
 
 import { createContext, useContext } from "react";
-import type { UserRole } from "../services/userService";
+import type { UserRole } from "../types/userRoleType";
 
 export interface AppContextData {
   cycle: string;
   setCycle: (cycle: string) => void;
   selectedRole: UserRole | null;
-  setSelectedRole: (role: UserRole) => void;
+  setSelectedRole: (role: UserRole | null) => void;
 }
 
 export const AppContext = createContext<AppContextData | undefined>(

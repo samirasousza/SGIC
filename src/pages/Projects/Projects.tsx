@@ -1,97 +1,150 @@
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Breadcrumbs } from "../../components/Breadcrumbs";
 import { Card } from "../../components/Card";
 import { Icon } from "../../components/Icon";
 import { ListPagination } from "../../components/ListPagination";
 import { PageHeader } from "../../components/PageHeader";
-import { projectRows } from "./ProjectsData";
 import { useNavigate } from "react-router";
+import {
+  GetAllProjects,
+  GetProjectFilterOptions,
+} from "../../services/projectService";
+import type {
+  GetAllProjectsParams,
+  ProjectModel,
+  ProjectFilterOptionsModel,
+} from "../../models/projectModel";
 
 const pageSize = 10;
 
 const inputClass =
   "w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-700 outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100";
 
+const situationLabels: Record<string, string> = {
+  UP_TO_DATE: "Em dia",
+  PENDING: "Pendente",
+  LATE: "Atrasado",
+};
+
 const statusStyles: Record<string, string> = {
-  "Em andamento": "bg-blue-50 text-blue-700",
-  "Em avaliação": "bg-violet-50 text-violet-700",
-  Concluído: "bg-emerald-50 text-emerald-700",
-  Atenção: "bg-amber-50 text-amber-700",
+  UP_TO_DATE: "bg-emerald-50 text-emerald-700",
+  PENDING: "bg-amber-50 text-amber-700",
+  LATE: "bg-red-50 text-red-700",
+};
+
+const scholarshipLabels: Record<string, string> = {
+  SCHOLARSHIP_HOLDER: "Bolsista",
+  VOLUNTEER: "Voluntário",
+};
+
+const programLabels: Record<string, string> = {
+  PAIC: "PAIC",
+  PIBIC: "PIBIC",
+  PIBIC_AF: "PIBIC AF",
+  PIBITI: "PIBITI",
+  PBICT_AF: "PBICT AF",
+  VOLUNTEER: "Voluntário",
 };
 
 export function ProjectsPage() {
-  const [page, setPage] = useState(1);
-  const [query, setQuery] = useState("");
-  const [course, setCourse] = useState("all");
-  const [scholarship, setScholarship] = useState("all");
-  const [status, setStatus] = useState("all");
-  const [cycle, setCycle] = useState("all");
-  const [sort, setSort] = useState<"az" | "za">("az");
-
   const navigate = useNavigate();
 
-  const courses = useMemo(
-    () => [...new Set(projectRows.map((project) => project.course))].sort(),
-    [],
-  );
+  const [projects, setProjects] = useState<ProjectModel[]>([]);
+  const [filterOptions, setFilterOptions] =
+    useState<ProjectFilterOptionsModel | null>(null);
 
-  const cycles = useMemo(
-    () => [...new Set(projectRows.map((project) => project.cycle))].sort(),
-    [],
-  );
+  const [page, setPage] = useState(1);
+  const [query, setQuery] = useState("");
+  const [courseId, setCourseId] = useState("all");
+  const [scholarship, setScholarship] = useState("all");
+  const [program, setProgram] = useState("all");
+  const [status, setStatus] = useState("all");
+  const [cycle, setCycle] = useState("all");
+  const [sort, setSort] = useState("default");
 
-  const filteredProjects = useMemo(() => {
-    const normalizedQuery = query.trim().toLocaleLowerCase("pt-BR");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-    return projectRows
-      .filter((project) => {
-        const matchesQuery =
-          !normalizedQuery ||
-          `${project.title} ${project.student} ${project.advisor} ${project.course}`
-            .toLocaleLowerCase("pt-BR")
-            .includes(normalizedQuery);
-
-        const matchesCourse = course === "all" || project.course === course;
-
-        const matchesScholarship =
-          scholarship === "all" || project.scholarship === scholarship;
-
-        const matchesStatus = status === "all" || project.status === status;
-
-        const matchesCycle = cycle === "all" || project.cycle === cycle;
-
-        return (
-          matchesQuery &&
-          matchesCourse &&
-          matchesScholarship &&
-          matchesStatus &&
-          matchesCycle
+  // Busca as opções de filtros
+  useEffect(() => {
+    async function loadFilterOptions() {
+      try {
+        const data = await GetProjectFilterOptions(
+          cycle === "all" ? undefined : cycle,
         );
-      })
-      .slice()
-      .sort((first, second) =>
-        sort === "az"
-          ? first.title.localeCompare(second.title, "pt-BR")
-          : second.title.localeCompare(first.title, "pt-BR"),
-      );
-  }, [query, course, scholarship, status, cycle, sort]);
 
-  const totalPages = Math.max(1, Math.ceil(filteredProjects.length / pageSize));
+        setFilterOptions(data);
+      } catch (error) {
+        console.error("Erro ao carregar opções dos filtros:", error);
+      }
+    }
 
-  const currentPage = Math.min(page, totalPages);
+    loadFilterOptions();
+  }, [cycle]);
 
-  const pageProjects = filteredProjects.slice(
-    (currentPage - 1) * pageSize,
-    currentPage * pageSize,
-  );
+  // Busca os projetos sempre que algum filtro mudar
+  useEffect(() => {
+    let active = true;
+
+    async function loadProjects() {
+      try {
+        setLoading(true);
+        setError("");
+
+        const params: GetAllProjectsParams = {};
+
+        if (cycle !== "all") params.cycle = cycle;
+        if (query.trim()) params.q = query.trim();
+        if (courseId !== "all") params.courseId = courseId;
+        if (scholarship !== "all") {
+          params.scholarshipType =
+            scholarship as GetAllProjectsParams["scholarshipType"];
+        }
+        if (program !== "all") {
+          params.program = program as GetAllProjectsParams["program"];
+        }
+        if (status !== "all") {
+          params.situation = status as GetAllProjectsParams["situation"];
+        }
+
+        if (sort !== "default") {
+          params.sort = "TITLE";
+          params.direction = sort === "az" ? "ASC" : "DESC";
+        }
+
+        const data = await GetAllProjects(params);
+
+        if (active) {
+          setProjects(data);
+          setPage(1);
+        }
+      } catch (error) {
+        console.error("Erro ao carregar projetos:", error);
+
+        if (active) {
+          setError("Não foi possível carregar os projetos. Tente novamente.");
+          setProjects([]);
+        }
+      } finally {
+        if (active) setLoading(false);
+      }
+    }
+
+    loadProjects();
+
+    return () => {
+      active = false;
+    };
+  }, [query, courseId, scholarship, program, status, cycle, sort]);
 
   function resetFilters() {
     setQuery("");
-    setCourse("all");
+    setCourseId("all");
     setScholarship("all");
+    setProgram("all");
     setStatus("all");
     setCycle("all");
-    setSort("az");
+    setSort("default");
     setPage(1);
   }
 
@@ -99,6 +152,14 @@ export function ProjectsPage() {
     setter(value);
     setPage(1);
   }
+
+  const totalPages = Math.max(1, Math.ceil(projects.length / pageSize));
+  const currentPage = Math.min(page, totalPages);
+
+  const pageProjects = projects.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize,
+  );
 
   return (
     <div className="space-y-6">
@@ -132,7 +193,7 @@ export function ProjectsPage() {
               <input
                 value={query}
                 onChange={(event) => updateFilter(setQuery, event.target.value)}
-                placeholder="Projeto, aluno ou orientador"
+                placeholder="Projeto, aluno, orientador ou SISPROJ"
                 className={`${inputClass} pl-10`}
               />
             </div>
@@ -141,14 +202,16 @@ export function ProjectsPage() {
           <label className="space-y-1.5">
             <span className="text-sm font-medium text-slate-700">Curso</span>
             <select
-              value={course}
-              onChange={(event) => updateFilter(setCourse, event.target.value)}
+              value={courseId}
+              onChange={(event) =>
+                updateFilter(setCourseId, event.target.value)
+              }
               className={inputClass}
             >
               <option value="all">Todos os cursos</option>
-              {courses.map((item) => (
-                <option key={item} value={item}>
-                  {item}
+              {filterOptions?.courses.map((item) => (
+                <option key={item.id} value={item.id}>
+                  {item.name}
                 </option>
               ))}
             </select>
@@ -166,9 +229,24 @@ export function ProjectsPage() {
               className={inputClass}
             >
               <option value="all">Todos os tipos</option>
-              <option value="Voluntário">Voluntário</option>
-              <option value="ICT">ICT</option>
-              <option value="PAIC">PAIC</option>
+              <option value="SCHOLARSHIP_HOLDER">Bolsista</option>
+              <option value="VOLUNTEER">Voluntário</option>
+            </select>
+          </label>
+
+          <label className="space-y-1.5">
+            <span className="text-sm font-medium text-slate-700">Programa</span>
+            <select
+              value={program}
+              onChange={(event) => updateFilter(setProgram, event.target.value)}
+              className={inputClass}
+            >
+              <option value="all">Todos os programas</option>
+              {filterOptions?.programs.map((item) => (
+                <option key={item} value={item}>
+                  {programLabels[item] ?? item}
+                </option>
+              ))}
             </select>
           </label>
 
@@ -180,14 +258,13 @@ export function ProjectsPage() {
               className={inputClass}
             >
               <option value="all">Todas as situações</option>
-              <option value="Em andamento">Em andamento</option>
-              <option value="Em avaliação">Em avaliação</option>
-              <option value="Concluído">Concluído</option>
-              <option value="Atenção">Atenção</option>
+              <option value="UP_TO_DATE">Em dia</option>
+              <option value="PENDING">Pendente</option>
+              <option value="LATE">Atrasado</option>
             </select>
           </label>
 
-          <label className="space-y-1.5">
+          {/* <label className="space-y-1.5">
             <span className="text-sm font-medium text-slate-700">Ciclo</span>
             <select
               value={cycle}
@@ -195,13 +272,13 @@ export function ProjectsPage() {
               className={inputClass}
             >
               <option value="all">Todos os ciclos</option>
-              {cycles.map((item) => (
+              {filterOptions?.cycles.map((item) => (
                 <option key={item} value={item}>
                   {item}
                 </option>
               ))}
             </select>
-          </label>
+          </label> */}
 
           <label className="space-y-1.5">
             <span className="text-sm font-medium text-slate-700">
@@ -209,21 +286,20 @@ export function ProjectsPage() {
             </span>
             <select
               value={sort}
-              onChange={(event) =>
-                updateFilter(setSort, event.target.value as "az" | "za")
-              }
+              onChange={(event) => updateFilter(setSort, event.target.value)}
               className={inputClass}
             >
-              <option value="az">Nome: A–Z</option>
-              <option value="za">Nome: Z–A</option>
+              <option value="default">Padrão</option>
+              <option value="az">Título: A–Z</option>
+              <option value="za">Título: Z–A</option>
             </select>
           </label>
         </div>
 
         <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-4">
           <p className="text-sm text-slate-500">
-            {filteredProjects.length}{" "}
-            {filteredProjects.length === 1
+            {projects.length}{" "}
+            {projects.length === 1
               ? "projeto encontrado"
               : "projetos encontrados"}
           </p>
@@ -243,11 +319,19 @@ export function ProjectsPage() {
         <div className="border-b border-slate-100 px-5 py-4 sm:px-6">
           <h2 className="font-semibold text-slate-900">Lista de projetos</h2>
           <p className="mt-1 text-sm text-slate-500">
-            Dados de demonstração para o desenvolvimento do sistema.
+            Projetos cadastrados no sistema.
           </p>
         </div>
 
-        {pageProjects.length > 0 ? (
+        {loading ? (
+          <div className="px-6 py-16 text-center text-sm text-slate-500">
+            Carregando projetos...
+          </div>
+        ) : error ? (
+          <div className="px-6 py-16 text-center text-sm text-red-600">
+            {error}
+          </div>
+        ) : pageProjects.length > 0 ? (
           <div className="overflow-x-auto">
             <table className="w-full min-w-[850px] border-collapse text-left">
               <thead>
@@ -273,26 +357,27 @@ export function ProjectsPage() {
                         {project.title}
                       </p>
                       <p className="mt-1 text-xs text-slate-400">
-                        {project.unit}
+                        {project.unit.acronym}
                       </p>
                     </td>
 
                     <td className="px-6 py-4">
                       <p className="text-sm font-medium text-slate-700">
-                        {project.student}
+                        {project.student.name}
                       </p>
                       <p className="mt-1 text-xs text-slate-500">
-                        {project.course}
+                        {project.studentCourse}
                       </p>
                     </td>
 
                     <td className="px-6 py-4 text-sm text-slate-600">
-                      {project.advisor}
+                      {project.advisor.name}
                     </td>
 
                     <td className="px-6 py-4">
                       <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700">
-                        {project.scholarship}
+                        {scholarshipLabels[project.scholarshipType] ??
+                          project.scholarshipType}
                       </span>
                     </td>
 
@@ -303,11 +388,12 @@ export function ProjectsPage() {
                     <td className="px-6 py-4">
                       <span
                         className={`whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-semibold ${
-                          statusStyles[project.status] ??
+                          statusStyles[project.situation] ??
                           "bg-slate-100 text-slate-600"
                         }`}
                       >
-                        {project.status}
+                        {situationLabels[project.situation] ??
+                          project.situation}
                       </span>
                     </td>
                   </tr>
@@ -340,7 +426,7 @@ export function ProjectsPage() {
         <div className="border-t border-slate-100 px-4 py-3 sm:px-6">
           <ListPagination
             page={currentPage}
-            total={filteredProjects.length}
+            total={projects.length}
             label="projetos"
             onPageChange={setPage}
           />

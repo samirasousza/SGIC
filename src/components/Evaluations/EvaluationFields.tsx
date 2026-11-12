@@ -1,5 +1,5 @@
-import type { Role } from "../../pages/Login/LoginTypes";
 import { isAdvisorRole } from "../../pages/Projects/Projects.utils";
+import type { UserRole } from "../../types/userRoleType";
 import { ScoreField } from "./ScoreField";
 
 const fieldClass =
@@ -13,8 +13,8 @@ const textareaClass = `${inputClass} min-h-28 resize-y`;
 const selectClass =
   "h-11 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm font-normal text-slate-700 outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100";
 
-export function EvaluationFields({ role }: { role: Role }) {
-  if (role === "Aluno") {
+export function EvaluationFields({ role }: { role: UserRole }) {
+  if (role === "STUDENT") {
     return (
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
         <label className={`${fieldClass} md:col-span-2`}>
@@ -120,7 +120,7 @@ export function EvaluationFields({ role }: { role: Role }) {
     );
   }
 
-  if (role === "Avaliador") {
+  if (role === "EVALUATOR") {
     return (
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
         <ScoreField label="Qualidade e organização do trabalho" />

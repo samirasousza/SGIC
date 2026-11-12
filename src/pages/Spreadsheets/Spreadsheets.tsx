@@ -10,18 +10,17 @@ import { PageHeader } from "../../components/PageHeader";
 import { SpreadsheetExportModal } from "../../components/Spreadsheets/SpreadsheetExportModal";
 import { SpreadsheetCard } from "../../components/Spreadsheets/SpreadsheetCard";
 import { SpreadsheetFilters } from "../../components/Spreadsheets/SpreadsheetFilters";
-
-import type { Role } from "../Login/LoginTypes";
 import {
   spreadsheetDefinitions,
   spreadsheetExportHistory,
 } from "./SpreadsheetUtils";
+import type { UserRole } from "../../types/userRoleType";
 
 export function SpreadsheetsPage({
   role,
   cycle,
 }: {
-  role: Role;
+  role: UserRole;
   cycle: string;
 }) {
   const navigate = useNavigate();

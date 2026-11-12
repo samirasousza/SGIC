@@ -3,8 +3,8 @@ import { LoginForms } from "../../components/Login/LoginForms";
 import { Logo } from "../../components/Logo";
 import { login } from "../../services/authService";
 import axios from "axios";
-import type { ApiErrorResponse } from "../../utils/apiErrorResponse";
 import { useUser } from "../../contexts/userContext";
+import type { ApiErrorResponse } from "../../utils/apiErrorResponse";
 
 export function LoginPage() {
   const navigate = useNavigate();
@@ -18,6 +18,14 @@ export function LoginPage() {
       const data = await login(credentials);
 
       localStorage.setItem("authToken", data.token);
+
+      const user = await refreshUser();
+
+      if (!user) {
+        throw new Error("Não foi possível carregar os dados do usuário.");
+      }
+
+      navigate("/", { replace: true });
     } catch (err) {
       if (axios.isAxiosError<ApiErrorResponse>(err)) {
         const status = err.response?.status;
@@ -50,12 +58,12 @@ export function LoginPage() {
         );
       }
 
+      if (err instanceof Error) {
+        throw err;
+      }
+
       throw new Error("Erro inesperado. Tente novamente.", { cause: err });
     }
-
-    const me = await refreshUser();
-    if (!me) throw new Error("Não foi possível carregar seu perfil.");
-    navigate(me.mustChangePassword ? "/change-password" : "/");
   };
 
   return (

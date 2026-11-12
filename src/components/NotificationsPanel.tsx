@@ -1,5 +1,4 @@
-
-import type { Screen } from "../pages/Login/LoginTypes";
+import type { Screen } from "../types/ScreenType";
 import { Icon } from "./Icon";
 
 interface NotificationsPanelProps {

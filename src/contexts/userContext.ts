@@ -5,7 +5,8 @@ import {
 } from "react";
 
 import type { ReactNode } from "react";
-import type { UserModel, UserRole } from "../services/userService";
+import type { UserRole } from "../types/userRoleType";
+import type { UserModel } from "../models/userModel";
 
 type RegisterData = {
   cpf: string;

@@ -1,9 +1,9 @@
 import { useState } from "react";
-import type { Role } from "../../pages/Login/LoginTypes";
 import { Badge } from "../Badge";
 import { Button } from "../Button";
 import { Icon } from "../Icon";
 import { isMentorRole } from "../../pages/Projects/Projects.utils";
+import type { UserRole } from "../../types/userRoleType";
 
 export function ReportReview({
   role,
@@ -12,7 +12,7 @@ export function ReportReview({
   close,
   uploading,
 }: {
-  role: Role;
+  role: UserRole;
   name: string;
   archived: boolean;
   close: () => void;
@@ -238,7 +238,7 @@ export function ReportReview({
 
         {/* Footer Actions */}
         <div className="flex justify-end gap-2.5 border-t border-[#dce5e9] bg-[#fafcfc] p-[15px_24px]">
-          {role === "Aluno" && !archived && (
+          {role === "STUDENT" && !archived && (
             <Button variant="secondary" icon="upload" onClick={uploading}>
               Anexar nova versão
             </Button>

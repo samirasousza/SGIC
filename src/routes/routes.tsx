@@ -1,7 +1,11 @@
-import { Routes, Route, Navigate, Outlet, useNavigate } from "react-router-dom";
-import { useState } from "react";
-
-import type { Role, Screen } from "../pages/Login/LoginTypes";
+import {
+  Routes,
+  Route,
+  Navigate,
+  Outlet,
+  useNavigate,
+  useLocation,
+} from "react-router-dom";
 
 import { LoginPage } from "../pages/Login/Login";
 import { HomePage } from "../pages/Home/Home";
@@ -9,14 +13,16 @@ import { ProjectsPage } from "../pages/Projects/Projects";
 import { ProjectDetail } from "../pages/Projects/ProjectDetails";
 
 import { AppLayout } from "../components/AppLayout";
-import { ReportsPage } from "../pages/Reports/Reports";
-import { ProjectReportsDetail } from "../pages/Reports/ReportsDetail";
-import { EvaluationsPage } from "../pages/Evalutions/Evaluations";
-import { ProjectEvaluationDetail } from "../pages/Evalutions/EvaluationDetail";
-import { EvaluatorsPage } from "../pages/Evaluaters/Evaluaters";
-import { SpreadsheetsPage } from "../pages/Spreadsheets/Spreadsheets";
+// import { ReportsPage } from "../pages/Reports/Reports";
+// import { ProjectReportsDetail } from "../pages/Reports/ReportsDetail";
+// import { EvaluationsPage } from "../pages/Evalutions/Evaluations";
+// import { ProjectEvaluationDetail } from "../pages/Evalutions/EvaluationDetail";
+// import { EvaluatorsPage } from "../pages/Evaluaters/Evaluaters";
+// import { SpreadsheetsPage } from "../pages/Spreadsheets/Spreadsheets";
 import { useUser } from "../contexts/userContext";
 import { clearSession } from "../config/apiConfig";
+import { CompleteStudentProfile } from "../pages/UserProfile/CompleteUserProfile";
+import { ChangePasswordPage } from "../pages/ChangePassword/ChangePassword";
 
 // Definidos FORA do AppRoutes: se ficarem dentro, o React recria o componente
 // a cada render e toda a árvore de rotas é desmontada/remontada.
@@ -29,12 +35,40 @@ function ScreenLoading() {
 
 // Só deixa passar quem está autenticado
 function ProtectedRoute() {
-  const { user, loading } = useUser();
+  const { user, loading, refreshUser, clearUser } = useUser();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   if (loading) return <ScreenLoading />;
   if (!user) return <Navigate to="/login" replace />;
 
-  return <Outlet />;
+  const isStudent = user.roles.includes("STUDENT");
+  const needsProfileCompletion = isStudent && !user.profileCompleted;
+
+  function handleCancelProfile() {
+    clearSession();
+    clearUser();
+    navigate("/login", { replace: true });
+  }
+
+  if (needsProfileCompletion && location.pathname !== "/") {
+    return <Navigate to="/" replace />;
+  }
+
+  return (
+    <>
+      <Outlet />
+
+      {needsProfileCompletion && (
+        <CompleteStudentProfile
+          onCompleted={async () => {
+            await refreshUser();
+          }}
+          onCancel={handleCancelProfile}
+        />
+      )}
+    </>
+  );
 }
 
 // Quem já está logado não precisa ver a tela de login
@@ -51,10 +85,10 @@ export function AppRoutes() {
   const navigate = useNavigate();
   const { clearUser } = useUser();
 
-  const [role, setRole] = useState<Role>("Orientador");
-  const [screen, setScreen] = useState<Screen>("overview");
-  const [accountRole] = useState<Role>("Avaliador");
-  const [cycle, setCycle] = useState("2025–2026");
+  // const [role, setRole] = useState<UserRole>("");
+  // const [screen, setScreen] = useState<Screen>("overview");
+  // const [accountRole] = useState<UserRole>("");
+  // const [cycle, setCycle] = useState("2025–2026");
 
   function logout() {
     clearSession(); // remove token e flags de sessão
@@ -63,13 +97,6 @@ export function AppRoutes() {
   }
 
   const layoutProps = {
-    role,
-    accountRole,
-    setRole,
-    screen,
-    setScreen,
-    cycle,
-    setCycle,
     logout,
   };
 
@@ -90,10 +117,11 @@ export function AppRoutes() {
           }
         >
           <Route path="/" element={<HomePage />} />
-          <Route path="/project" element={<ProjectsPage />} />
+          <Route path="/change-password" element={<ChangePasswordPage />} />
+          <Route path="/projects" element={<ProjectsPage />} />
           <Route path="/projects/:projectId" element={<ProjectDetail />} />
 
-          <Route
+          {/* <Route
             path="/reports"
             element={
               <ReportsPage
@@ -125,6 +153,7 @@ export function AppRoutes() {
             path="/spreadsheets"
             element={<SpreadsheetsPage role={role} cycle={cycle} />}
           />
+          */}
         </Route>
       </Route>
 

@@ -3,6 +3,7 @@ import { useUser } from "../contexts/userContext";
 import { formatCpf } from "../utils/formatCpf";
 import { formatPhone } from "../utils/formatPhone";
 import { translateRole } from "../utils/translateRole";
+import { useNavigate } from "react-router";
 
 interface ProfileModalProps {
   close: () => void;
@@ -10,6 +11,8 @@ interface ProfileModalProps {
 
 export function ProfileModal({ close }: ProfileModalProps) {
   const { user, loading, error, refreshUser } = useUser();
+
+  const navigate = useNavigate();
 
   const isStudent = user?.roles.includes("STUDENT");
 
@@ -67,7 +70,7 @@ export function ProfileModal({ close }: ProfileModalProps) {
             type="button"
             aria-label="Fechar"
             onClick={close}
-            className="rounded-lg p-2 text-slate-500 transition hover:bg-slate-100"
+            className="cursor-pointer rounded-lg p-2 text-slate-500 transition hover:bg-slate-100"
           >
             <Icon name="close" size={20} />
           </button>
@@ -139,7 +142,18 @@ export function ProfileModal({ close }: ProfileModalProps) {
           </div>
         </div>
 
-        <div className="flex justify-end border-t border-slate-100 px-6 py-4">
+        <div className="flex flex-col-reverse gap-3 border-t border-slate-100 px-6 py-4 sm:flex-row sm:justify-between">
+          <button
+            type="button"
+            onClick={() => {
+              close();
+              navigate("/change-password");
+            }}
+            className="cursor-pointer rounded-xl border border-slate-200 px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+          >
+            Alterar senha
+          </button>
+
           <button
             type="button"
             onClick={close}

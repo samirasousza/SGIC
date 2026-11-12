@@ -1,10 +1,10 @@
+import type { UserRole } from "../../types/userRoleType";
 import { Badge } from "../Badge";
 import { Card } from "../Card";
 import { Icon } from "../Icon";
-import type { Role } from "../../pages/Login/LoginTypes";
 
 interface SpreadsheetFiltersProps {
-  role: Role;
+  role: UserRole;
   cycle: string;
   defense: "Parcial" | "Final";
   setDefense: (defense: "Parcial" | "Final") => void;
@@ -20,7 +20,7 @@ export function SpreadsheetFilters({
   unit,
   setUnit,
 }: SpreadsheetFiltersProps) {
-  const isAdmin = role === "Administrador";
+  const isAdmin = role === "ADMIN";
 
   return (
     <Card className="mb-8">

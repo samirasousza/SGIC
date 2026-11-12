@@ -1,15 +1,15 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-
-import { navOptions } from "../pages/Login/LoginTypes";
 
 import { Icon } from "./Icon";
 import { Logo } from "./Logo";
 import { ProfileModal } from "./ProfileModal";
+
 import { useUser } from "../contexts/userContext";
-import { translateRole } from "../utils/translateRole";
-import type { UserRole } from "../services/userService";
 import { useAppContext } from "../contexts/appContext";
+import { translateRole } from "../utils/translateRole";
+import type { UserRole } from "../types/userRoleType";
+import { getNavigationOptions, getScreenPath } from "../utils/navigation";
 
 interface SidebarProps {
   mobileOpen: boolean;
@@ -17,96 +17,34 @@ interface SidebarProps {
   logout: () => void;
 }
 
-const rolePermissions: Record<UserRole, string[]> = {
-  STUDENT: ["", "project", "reports"],
-
-  ADVISOR: ["", "project", "reports", "evaluations", "evaluators"],
-
-  LOCAL_COMMITTEE: [
-    "",
-    "project",
-    "reports",
-    "evaluations",
-    "evaluators",
-    "spreadsheets",
-  ],
-
-  EVALUATOR: ["evaluations"],
-
-  TECHNICAL_SUPPORT: [
-    "",
-    "project",
-    "reports",
-    "evaluations",
-    "evaluators",
-    "spreadsheets",
-  ],
-
-  ADMIN: [
-    "",
-    "project",
-    "reports",
-    "evaluations",
-    "evaluators",
-    "spreadsheets",
-    "users",
-  ],
-};
-
-export function Sidebar({ mobileOpen, setMobileOpen, logout }: SidebarProps) {
+export function Sidebar({
+  mobileOpen,
+  setMobileOpen,
+  logout,
+}: SidebarProps) {
   const [profileOpen, setProfileOpen] = useState(false);
 
   const navigate = useNavigate();
   const location = useLocation();
 
   const { user } = useUser();
-
-  const userRoles = user?.roles ?? [];
-
   const { selectedRole } = useAppContext();
 
-  const allowedScreens = selectedRole ? rolePermissions[selectedRole] : [];
+  const previousRole = useRef<UserRole | null>(selectedRole);
 
-  const visibleOptions = navOptions.filter((item) =>
-    allowedScreens.includes(item.screen),
-  );
+  useEffect(() => {
+    if (
+      selectedRole &&
+      previousRole.current &&
+      previousRole.current !== selectedRole
+    ) {
+      navigate("/");
+    }
 
-  // Reúne as permissões de todas as funções do usuário.
-  // const allowedScreens = new Set(
-  //   userRoles.flatMap((role) => rolePermissions[role]),
-  // );
+    previousRole.current = selectedRole;
+  }, [selectedRole, navigate]);
 
-  // Comitê local e administrador acessam projetos da unidade.
-  // const hasUnitProjectAccess = userRoles.some(
-  //   (role) =>
-  //     role === "LOCAL_COMMITTEE" ||
-  //     role === "TECHNICAL_SUPPORT" ||
-  //     role === "ADMIN",
-  // );
-
-  // const visibleOptions = navOptions
-  //   .filter((item) => allowedScreens.has(item.screen))
-  //   .map((item) => ({
-  //     ...item,
-  //     label:
-  //       item.screen === "project"
-  //         ? hasUnitProjectAccess
-  //           ? "Projetos da unidade"
-  //           : "Meus projetos"
-  //         : item.label,
-  //   }));
-
-  function initialsName(name?: string): string {
-    if (!name) return "";
-
-    return name
-      .split(" ")
-      .filter(Boolean)
-      .slice(0, 2)
-      .map((part) => part[0])
-      .join("")
-      .toUpperCase();
-  }
+  const visibleOptions = getNavigationOptions(selectedRole);
 
   return (
     <>
@@ -144,12 +82,11 @@ export function Sidebar({ mobileOpen, setMobileOpen, logout }: SidebarProps) {
 
           <div className="space-y-1">
             {visibleOptions.map((item) => {
-              const path = item.screen ? `/${item.screen}` : "/";
+              const path = getScreenPath(item.screen);
 
               const active =
                 location.pathname === path ||
-                (item.screen !== "" &&
-                  location.pathname.startsWith(`${path}/`));
+                (path !== "/" && location.pathname.startsWith(`${path}/`));
 
               return (
                 <button
@@ -185,7 +122,7 @@ export function Sidebar({ mobileOpen, setMobileOpen, logout }: SidebarProps) {
             className="mb-4 flex w-full cursor-pointer items-center gap-3 rounded-xl bg-slate-50 p-3 text-left"
           >
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-sm font-bold text-indigo-700">
-              {initialsName(user?.name)}
+              <Icon name="user" size={19} />
             </div>
 
             <div className="min-w-0">
