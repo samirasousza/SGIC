@@ -1,3 +1,4 @@
+import type { AcademicTitleType } from "../types/academicTitleType";
 import type { ProjectProgram } from "../types/projectProgram";
 import type { ProjectSituation } from "../types/projectSituation";
 import type { ProjectSort } from "../types/projectSort";
@@ -31,8 +32,9 @@ export interface ProjectModel {
   scholarshipType: ScholarshipType;
   unit: UnitModel;
   student: ProjectPersonModel;
-  studentCourse: string;
+  studentCourse: string | null;
   advisor: ProjectPersonModel;
+  advisorCourse: string | null;
   startDate: string;
   endDate: string;
   situation: ProjectSituation;
@@ -48,7 +50,14 @@ export interface ProjectDetailsModel {
   noticeNumber: string | null;
   cycle: string;
   unit: UnitModel;
-  advisor: ProjectPersonModel;
+  advisor: {
+    id: string;
+    name: string;
+    email: string;
+    course: CourseModel | null;
+    academicTitle: AcademicTitleType | null;
+    institution: string | null;
+  };
   coAdvisor: ProjectPersonModel | null;
   student: {
     id: string;
@@ -70,11 +79,8 @@ export interface ProjectDetailsModel {
 
 export interface ProjectFilterOptionsModel {
   cycles: string[];
-  courses: {
-    id: string;
-    name: string;
-    unit: UnitModel;
-  }[];
+  studentCourses: CourseModel[];
+  advisorCourses: CourseModel[];
   programs: string[];
   advisors: ProjectPersonModel[];
   units: UnitModel[];
@@ -83,7 +89,8 @@ export interface ProjectFilterOptionsModel {
 export interface GetAllProjectsParams {
   cycle?: string;
   q?: string; // Busca, sem diferenciar maiúsculas, no título, nome do aluno, nome do orientador e nº SISPROJ. Example : maria
-  courseId?: string;
+  studentCourseId?: string;
+  advisorCourseId?: string;
   program?: ProjectProgram; // tipo de bolsa
   scholarshipType?: ScholarshipType; // bolsista ou voluntário
   situation?: ProjectSituation; //situação dos relatórios

@@ -25,6 +25,12 @@ export const getAllUsers = async (
   return (await api.get<PaginatedUsersModel>(API_URL_USER, { params })).data;
 };
 
+export const getUserById = async (
+  id: string,
+): Promise<UserModel> => {
+  return (await api.get<UserModel>(`${API_URL_USER}/${id}`)).data;
+};
+
 export const registerUser = async (
   data: RegisterUserModel,
 ): Promise<RegisterUserResponse> => {

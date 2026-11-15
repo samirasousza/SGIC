@@ -14,11 +14,11 @@ import type {
   ProjectModel,
   ProjectFilterOptionsModel,
 } from "../../models/projectModel";
+import { scholarshipLabels } from "../../utils/translateScholarship";
+import { useAppContext } from "../../contexts/appContext";
+import { initialProjectFilters, ProjectFilter, type ProjectFiltersValue } from "../../components/Projects/ProjectsFilter";
 
 const pageSize = 10;
-
-const inputClass =
-  "w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-700 outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100";
 
 const situationLabels: Record<string, string> = {
   UP_TO_DATE: "Em dia",
@@ -32,45 +32,43 @@ const statusStyles: Record<string, string> = {
   LATE: "bg-red-50 text-red-700",
 };
 
-const scholarshipLabels: Record<string, string> = {
-  SCHOLARSHIP_HOLDER: "Bolsista",
-  VOLUNTEER: "Voluntário",
-};
-
-const programLabels: Record<string, string> = {
-  PAIC: "PAIC",
-  PIBIC: "PIBIC",
-  PIBIC_AF: "PIBIC AF",
-  PIBITI: "PIBITI",
-  PBICT_AF: "PBICT AF",
-  VOLUNTEER: "Voluntário",
-};
-
 export function ProjectsPage() {
   const navigate = useNavigate();
+  const { cycle, cyclesLoading } = useAppContext();
 
   const [projects, setProjects] = useState<ProjectModel[]>([]);
   const [filterOptions, setFilterOptions] =
     useState<ProjectFilterOptionsModel | null>(null);
 
   const [page, setPage] = useState(1);
-  const [query, setQuery] = useState("");
-  const [courseId, setCourseId] = useState("all");
-  const [scholarship, setScholarship] = useState("all");
-  const [program, setProgram] = useState("all");
-  const [status, setStatus] = useState("all");
-  const [cycle, setCycle] = useState("all");
-  const [sort, setSort] = useState("default");
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [filters, setFilters] = useState<ProjectFiltersValue>(
+    initialProjectFilters,
+  );
+
+  function changeFilter<K extends keyof ProjectFiltersValue>(
+    field: K,
+    value: ProjectFiltersValue[K],
+  ) {
+    setFilters((prev) => ({ ...prev, [field]: value }));
+    setPage(1);
+  }
+
+  function resetFilters() {
+    setFilters(initialProjectFilters);
+    setPage(1);
+  }
 
   // Busca as opções de filtros
   useEffect(() => {
+    if (cyclesLoading) return;
+
     async function loadFilterOptions() {
       try {
         const data = await GetProjectFilterOptions(
-          cycle === "all" ? undefined : cycle,
+          cycle && cycle !== "all" ? cycle : undefined,
         );
 
         setFilterOptions(data);
@@ -80,11 +78,13 @@ export function ProjectsPage() {
     }
 
     loadFilterOptions();
-  }, [cycle]);
+  }, [cycle, cyclesLoading]);
 
   // Busca os projetos sempre que algum filtro mudar
   useEffect(() => {
     let active = true;
+
+    if (cyclesLoading) return;
 
     async function loadProjects() {
       try {
@@ -93,23 +93,26 @@ export function ProjectsPage() {
 
         const params: GetAllProjectsParams = {};
 
-        if (cycle !== "all") params.cycle = cycle;
-        if (query.trim()) params.q = query.trim();
-        if (courseId !== "all") params.courseId = courseId;
-        if (scholarship !== "all") {
+        if (cycle && cycle !== "all") params.cycle = cycle;
+        if (filters.query.trim()) params.q = filters.query.trim();
+        if (filters.studentCourseId !== "all")
+          params.studentCourseId = filters.studentCourseId;
+        if (filters.advisorCourseId !== "all")
+          params.advisorCourseId = filters.advisorCourseId;
+        if (filters.scholarship !== "all") {
           params.scholarshipType =
-            scholarship as GetAllProjectsParams["scholarshipType"];
+            filters.scholarship as GetAllProjectsParams["scholarshipType"];
         }
-        if (program !== "all") {
-          params.program = program as GetAllProjectsParams["program"];
+        if (filters.program !== "all") {
+          params.program = filters.program as GetAllProjectsParams["program"];
         }
-        if (status !== "all") {
-          params.situation = status as GetAllProjectsParams["situation"];
+        if (filters.status !== "all") {
+          params.situation =
+            filters.status as GetAllProjectsParams["situation"];
         }
-
-        if (sort !== "default") {
+        if (filters.sort !== "default") {
           params.sort = "TITLE";
-          params.direction = sort === "az" ? "ASC" : "DESC";
+          params.direction = filters.sort === "az" ? "ASC" : "DESC";
         }
 
         const data = await GetAllProjects(params);
@@ -135,23 +138,7 @@ export function ProjectsPage() {
     return () => {
       active = false;
     };
-  }, [query, courseId, scholarship, program, status, cycle, sort]);
-
-  function resetFilters() {
-    setQuery("");
-    setCourseId("all");
-    setScholarship("all");
-    setProgram("all");
-    setStatus("all");
-    setCycle("all");
-    setSort("default");
-    setPage(1);
-  }
-
-  function updateFilter<T>(setter: (value: T) => void, value: T) {
-    setter(value);
-    setPage(1);
-  }
+  }, [filters, cycle, cyclesLoading]);
 
   const totalPages = Math.max(1, Math.ceil(projects.length / pageSize));
   const currentPage = Math.min(page, totalPages);
@@ -172,156 +159,17 @@ export function ProjectsPage() {
 
       <PageHeader
         title="Projetos"
-        description="Consulte os projetos cadastrados, seus participantes, cursos, bolsas e situação atual."
       />
 
-      <Card className="space-y-5">
-        <div>
-          <h2 className="text-base font-semibold text-slate-900">
-            Buscar e filtrar projetos
-          </h2>
-          <p className="mt-1 text-sm text-slate-500">
-            Utilize os filtros para encontrar os projetos desejados.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          <label className="space-y-1.5">
-            <span className="text-sm font-medium text-slate-700">Busca</span>
-            <div className="relative">
-              <Icon name="search" size={18} />
-              <input
-                value={query}
-                onChange={(event) => updateFilter(setQuery, event.target.value)}
-                placeholder="Projeto, aluno, orientador ou SISPROJ"
-                className={`${inputClass} pl-10`}
-              />
-            </div>
-          </label>
-
-          <label className="space-y-1.5">
-            <span className="text-sm font-medium text-slate-700">Curso</span>
-            <select
-              value={courseId}
-              onChange={(event) =>
-                updateFilter(setCourseId, event.target.value)
-              }
-              className={inputClass}
-            >
-              <option value="all">Todos os cursos</option>
-              {filterOptions?.courses.map((item) => (
-                <option key={item.id} value={item.id}>
-                  {item.name}
-                </option>
-              ))}
-            </select>
-          </label>
-
-          <label className="space-y-1.5">
-            <span className="text-sm font-medium text-slate-700">
-              Tipo de bolsa
-            </span>
-            <select
-              value={scholarship}
-              onChange={(event) =>
-                updateFilter(setScholarship, event.target.value)
-              }
-              className={inputClass}
-            >
-              <option value="all">Todos os tipos</option>
-              <option value="SCHOLARSHIP_HOLDER">Bolsista</option>
-              <option value="VOLUNTEER">Voluntário</option>
-            </select>
-          </label>
-
-          <label className="space-y-1.5">
-            <span className="text-sm font-medium text-slate-700">Programa</span>
-            <select
-              value={program}
-              onChange={(event) => updateFilter(setProgram, event.target.value)}
-              className={inputClass}
-            >
-              <option value="all">Todos os programas</option>
-              {filterOptions?.programs.map((item) => (
-                <option key={item} value={item}>
-                  {programLabels[item] ?? item}
-                </option>
-              ))}
-            </select>
-          </label>
-
-          <label className="space-y-1.5">
-            <span className="text-sm font-medium text-slate-700">Situação</span>
-            <select
-              value={status}
-              onChange={(event) => updateFilter(setStatus, event.target.value)}
-              className={inputClass}
-            >
-              <option value="all">Todas as situações</option>
-              <option value="UP_TO_DATE">Em dia</option>
-              <option value="PENDING">Pendente</option>
-              <option value="LATE">Atrasado</option>
-            </select>
-          </label>
-
-          {/* <label className="space-y-1.5">
-            <span className="text-sm font-medium text-slate-700">Ciclo</span>
-            <select
-              value={cycle}
-              onChange={(event) => updateFilter(setCycle, event.target.value)}
-              className={inputClass}
-            >
-              <option value="all">Todos os ciclos</option>
-              {filterOptions?.cycles.map((item) => (
-                <option key={item} value={item}>
-                  {item}
-                </option>
-              ))}
-            </select>
-          </label> */}
-
-          <label className="space-y-1.5">
-            <span className="text-sm font-medium text-slate-700">
-              Ordenar por
-            </span>
-            <select
-              value={sort}
-              onChange={(event) => updateFilter(setSort, event.target.value)}
-              className={inputClass}
-            >
-              <option value="default">Padrão</option>
-              <option value="az">Título: A–Z</option>
-              <option value="za">Título: Z–A</option>
-            </select>
-          </label>
-        </div>
-
-        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-4">
-          <p className="text-sm text-slate-500">
-            {projects.length}{" "}
-            {projects.length === 1
-              ? "projeto encontrado"
-              : "projetos encontrados"}
-          </p>
-
-          <button
-            type="button"
-            onClick={resetFilters}
-            className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-indigo-600 transition hover:bg-indigo-50"
-          >
-            <Icon name="close" size={16} />
-            Limpar filtros
-          </button>
-        </div>
-      </Card>
+      <ProjectFilter
+        filters={filters}
+        options={filterOptions}
+        total={projects.length}
+        onChange={changeFilter}
+        onReset={resetFilters}
+      />
 
       <Card className="overflow-hidden p-0">
-        <div className="border-b border-slate-100 px-5 py-4 sm:px-6">
-          <h2 className="font-semibold text-slate-900">Lista de projetos</h2>
-          <p className="mt-1 text-sm text-slate-500">
-            Projetos cadastrados no sistema.
-          </p>
-        </div>
 
         {loading ? (
           <div className="px-6 py-16 text-center text-sm text-slate-500">
@@ -370,8 +218,13 @@ export function ProjectsPage() {
                       </p>
                     </td>
 
-                    <td className="px-6 py-4 text-sm text-slate-600">
-                      {project.advisor.name}
+                    <td className="px-6 py-4">
+                      <p className="text-sm text-slate-600">
+                        {project.advisor.name}
+                      </p>
+                      <p className="mt-1 text-xs text-slate-500">
+                        {project.advisorCourse ?? "—"}
+                      </p>
                     </td>
 
                     <td className="px-6 py-4">

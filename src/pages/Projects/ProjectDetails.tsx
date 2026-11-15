@@ -10,6 +10,8 @@ import { Button } from "../../components/Button";
 
 import { GetProjectDetails } from "../../services/projectService";
 import type { ProjectDetailsModel } from "../../models/projectModel";
+import { scholarshipLabels } from "../../utils/translateScholarship";
+import { academicTitleLabels } from "../../utils/translateAcademicTitle";
 
 const programLabels: Record<string, string> = {
   PAIC: "PAIC — Programa de Apoio à Iniciação Científica",
@@ -18,11 +20,6 @@ const programLabels: Record<string, string> = {
   PIBITI:
     "PIBITI — Programa Institucional de Bolsas de Iniciação em Desenvolvimento Tecnológico e Inovação",
   PBICT_AF: "PBICT-AF",
-  VOLUNTEER: "Voluntário",
-};
-
-const scholarshipLabels: Record<string, string> = {
-  SCHOLARSHIP_HOLDER: "Bolsista",
   VOLUNTEER: "Voluntário",
 };
 
@@ -147,7 +144,6 @@ export function ProjectDetail() {
       {/* Cabeçalho */}
       <PageHeader
         title={project.title}
-        description={`${project.student.name} • Orientador: ${project.advisor.name}`}
       />
 
       {/* Atalhos para as funcionalidades do projeto */}
@@ -257,11 +253,34 @@ export function ProjectDetail() {
             value={`${project.unit.name} (${project.unit.acronym})`}
           />
 
+          <ProjectDataField
+            label="Área"
+            value={project.area || "Não informado"}
+          />
+
+          <ProjectDataField
+            label="Subárea"
+            value={project.subarea || "Não informado"}
+          />
+
           <ProjectDataField label="Orientador" value={project.advisor.name} />
 
           <ProjectDataField
             label="E-mail do orientador"
             value={project.advisor.email || "Não informado"}
+          />
+
+          <ProjectDataField
+            label="Curso do orientador"
+            value={project.advisor.course?.name || "Não informado"}
+          />
+          <ProjectDataField
+            label="Titulação do orientador"
+            value={
+              project.advisor.academicTitle
+                ? academicTitleLabels[project.advisor.academicTitle]
+                : "Não informado"
+            }
           />
 
           <ProjectDataField
@@ -292,16 +311,6 @@ export function ProjectDetail() {
                 : "Não informado"
             }
           />
-
-          <ProjectDataField
-            label="Área"
-            value={project.area || "Não informado"}
-          />
-
-          <ProjectDataField
-            label="Subárea"
-            value={project.subarea || "Não informado"}
-          />
         </div>
       </Card>
 
@@ -311,9 +320,6 @@ export function ProjectDetail() {
           <h2 className="text-base font-semibold text-slate-800">
             Dados do aluno
           </h2>
-          <p className="mt-1 text-sm text-slate-500">
-            Informações do cadastro complementar do estudante.
-          </p>
         </div>
 
         <div className="grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2 lg:grid-cols-3">

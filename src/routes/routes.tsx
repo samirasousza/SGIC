@@ -13,7 +13,6 @@ import { ProjectsPage } from "../pages/Projects/Projects";
 import { ProjectDetail } from "../pages/Projects/ProjectDetails";
 import { EvaluatorsPage } from "../pages/Evaluaters/Evaluaters";
 
-
 import { useUser } from "../contexts/userContext";
 import { clearSession } from "../config/apiConfig";
 import { CompleteStudentProfile } from "../pages/UserProfile/CompleteUserProfile";
@@ -24,6 +23,8 @@ import { UserAddPage } from "../pages/Users/RegisterUsers";
 // import { UserEditPage } from "../pages/Users/EditUsers";
 import { PendingUsersPage } from "../pages/Users/PedingUsers";
 import { SettingsPage } from "../pages/Settings/Settings";
+import { MyUserRequestsPage } from "../pages/Users/MyUserRequest";
+import { UserEditPage } from "../pages/Users/EditUsers";
 
 function ScreenLoading() {
   return (
@@ -133,12 +134,16 @@ export function AppRoutes() {
             path="/projects/:projectId/evaluators"
             element={<EvaluatorsPage />}
           />
+          <Route
+            path="/projects/:projectId/evaluators/requests"
+            element={<MyUserRequestsPage />}
+          />
 
           {/* Rotas administrativas: somente ADMIN */}
           <Route element={<AdminRoute />}>
             <Route path="/users" element={<UsersPage />} />
             <Route path="/user-add" element={<UserAddPage />} />
-            {/* <Route path="/user-edit/:id" element={<UserEditPage />} /> */}
+            <Route path="/user-edit/:id" element={<UserEditPage />} />
             <Route path="/pending-users" element={<PendingUsersPage />} />
             <Route path="/settings" element={<SettingsPage />} />
           </Route>

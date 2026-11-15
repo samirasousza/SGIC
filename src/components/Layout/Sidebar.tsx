@@ -69,7 +69,7 @@ export function Sidebar({
             type="button"
             aria-label="Fechar menu"
             onClick={() => setMobileOpen(false)}
-            className="rounded-lg p-2 text-slate-500 transition hover:bg-slate-100 lg:hidden"
+            className="cursor-pointer rounded-lg p-2 text-slate-500 transition hover:bg-slate-100 lg:hidden"
           >
             <Icon name="close" size={20} />
           </button>

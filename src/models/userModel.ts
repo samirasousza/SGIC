@@ -1,23 +1,44 @@
+import type { AcademicTitleType } from "../types/academicTitleType";
 import type { UserRole } from "../types/userRoleType";
+import type { CourseModel } from "./projectModel";
 
 export interface UserModel {
   id: string;
   name: string;
   email: string;
-  cpf: string;
-  phone: string;
-  registration: string;
-  pcd: boolean;
-  hasDegree: boolean;
-  course: {
-    id: string;
-    name: string;
-    unit: { id: string; name: string; acronym: string };
-  };
+  cpf: string | null;
+  phone: string | null;
+  registration: string | null;
+  pcd: boolean | null;
+  hasDegree: boolean | null;
+  course: CourseModel | null;
+  academicTitle: AcademicTitleType | null;
+  institution: string | null;
   roles: UserRole[];
   active: boolean;
   profileCompleted: boolean;
   mustChangePassword: boolean;
+}
+
+export interface RegisterUserModel {
+  name: string;
+  email: string;
+  cpf: string;
+  phone: string;
+  courseId?: string | null;
+  academicTitle?: AcademicTitleType | null;
+  institution?: string | null;
+  roles: UserRole[];
+  requestId?: string | null; // preenchido quando o cadastro vem de uma solicitação
+}
+
+export interface TeacherModel {
+  id: string;
+  name: string;
+  email: string;
+  course: CourseModel | null;
+  academicTitle: AcademicTitleType | null;
+  institution: string | null;
 }
 
 export interface UserInfosUpdateModel {
@@ -30,30 +51,6 @@ export interface UserInfosUpdateModel {
 
 export interface UpdateUserRolesModel {
   roles: UserRole[];
-}
-
-export interface RegisterUserModel {
-  name: string;
-  email: string;
-  cpf: string;
-  phone: string;
-  courseId: string;
-  roles: UserRole[];
-}
-
-export interface TeacherModel {
-  id: string;
-  name: string;
-  email: string;
-  course: {
-    id: string;
-    name: string;
-    unit: {
-      id: string;
-      name: string;
-      acronym: string;
-    };
-  };
 }
 
 export interface GetAllUsersParams {

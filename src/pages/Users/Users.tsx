@@ -8,9 +8,10 @@ import { UserTable } from "../../components/Users/UserTable";
 import { UserFilters } from "../../components/Users/UserFilters";
 import type { UserFiltersState } from "../../components/Users/UserFilters";
 import { ListPagination } from "../../components/ListPagination";
-import type { PendingUser } from "../../components/Users/PendingUserCard";
 import { Icon } from "../../components/Icon";
 import { PendingUsersPage } from "./PedingUsers";
+import { getAllUserRequests } from "../../services/userRequestssService";
+import { Breadcrumbs } from "../../components/Breadcrumbs";
 
 const PAGE_SIZE = 10;
 
@@ -19,11 +20,17 @@ export function UsersPage() {
 
   const [users, setUsers] = useState<UserModel[]>([]);
   const [activeTab, setActiveTab] = useState<"users" | "pending">("users");
-  const [pendingRequests, setPendingRequests] = useState<PendingUser[]>([]);
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [pendingCount, setPendingCount] = useState(0);
+
+  useEffect(() => {
+    getAllUserRequests(["PENDING"])
+      .then((d) => setPendingCount(d.length))
+      .catch(() => undefined);
+  }, []);
 
   const [filters, setFilters] = useState<UserFiltersState>({
     query: "",
@@ -92,7 +99,12 @@ export function UsersPage() {
     <div className="space-y-6">
       <header className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
         <div>
-          <p className="text-sm font-medium text-blue-700">Administração</p>
+          <Breadcrumbs
+            items={[
+              { label: "Início", onClick: () => navigate("/") },
+              { label: "Usuários" },
+            ]}
+          />
 
           <h1 className="mt-1 text-2xl font-bold text-gray-900">
             Usuários e permissões
@@ -113,7 +125,7 @@ export function UsersPage() {
       </header>
 
       <section className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-        <div className="flex gap-2 border-b border-gray-200">
+        <div className="flex gap-2 border-b border-gray-200 mb-4">
           <button
             type="button"
             onClick={() => setActiveTab("users")}
@@ -143,17 +155,17 @@ export function UsersPage() {
             Cadastros pendentes
             <span
               className={`rounded-full px-2 py-0.5 text-xs ${
-                pendingRequests.length
+                pendingCount
                   ? "bg-amber-100 text-amber-700"
                   : "bg-gray-100 text-gray-500"
               }`}
             >
-              {pendingRequests.length}
+              {pendingCount}
             </span>
           </button>
         </div>
         <div className="mb-5">
-          <p className="text-sm text-gray-500">{total} usuários encontrados</p>
+          <p className="text-sm text-gray-500">{activeTab === "users" ? total : pendingCount} usuários encontrados</p>
         </div>
 
         {activeTab === "users" ? (
@@ -192,7 +204,7 @@ export function UsersPage() {
             )}
           </section>
         ) : (
-          <PendingUsersPage />
+          <PendingUsersPage onCountChange={setPendingCount} />
         )}
       </section>
     </div>

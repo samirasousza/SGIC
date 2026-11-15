@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { NotificationsPanel } from "../NotificationsPanel";
+// import { NotificationsPanel } from "../NotificationsPanel";
 import { ProfileModal } from "../ProfileModal";
 import { translateRole } from "../../utils/translateRole";
 import { useUser } from "../../contexts/userContext";
@@ -17,13 +17,15 @@ function allowsAllCycles(role: UserRole | null) {
 }
 
 export function Header({ setMobileOpen }: HeaderProps) {
-  const [notificationsOpen, setNotificationsOpen] = useState(false);
+  // const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  // const [cycles, setCycles] = useState<string[]>([]);
 
   const navigate = useNavigate();
 
   const { user } = useUser();
-  const { cycle, setCycle, selectedRole, setSelectedRole } = useAppContext();
+  const { cycle, setCycle, cycles, selectedRole, setSelectedRole } =
+    useAppContext();
 
   const availableViews = user?.roles ?? [];
 
@@ -31,6 +33,12 @@ export function Header({ setMobileOpen }: HeaderProps) {
     setSelectedRole(role);
     navigate("/");
   }
+
+  useEffect(() => {
+    if (cycle === "all" && !allowsAllCycles(selectedRole) && cycles.length) {
+      setCycle(cycles[0]);
+    }
+  }, [selectedRole, cycle, cycles, setCycle]);
 
   return (
     <>
@@ -40,7 +48,7 @@ export function Header({ setMobileOpen }: HeaderProps) {
             type="button"
             aria-label="Abrir menu"
             onClick={() => setMobileOpen(true)}
-            className="rounded-xl p-2 text-slate-600 transition hover:bg-slate-100 lg:hidden"
+            className="cursor-pointer rounded-xl p-2 text-slate-600 transition hover:bg-slate-100 lg:hidden"
           >
             <Icon name="menu" size={22} />
           </button>
@@ -64,12 +72,14 @@ export function Header({ setMobileOpen }: HeaderProps) {
 
             <select
               value={cycle}
-              onChange={(event) => setCycle(event.target.value)}
+              onChange={(e) => setCycle(e.target.value)}
               className="max-w-36 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
             >
-              <option value="2025/2026">2025/2026</option>
-              <option value="2024/2025">2024/2025</option>
-
+              {cycles.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
               {allowsAllCycles(selectedRole) && (
                 <option value="all">Todos os ciclos</option>
               )}
@@ -98,7 +108,7 @@ export function Header({ setMobileOpen }: HeaderProps) {
             </label>
           )}
 
-          <button
+          {/* <button
             type="button"
             aria-label="Notificações"
             onClick={() => setNotificationsOpen(true)}
@@ -106,7 +116,7 @@ export function Header({ setMobileOpen }: HeaderProps) {
           >
             <Icon name="bell" size={20} />
             <span className="absolute right-2 top-2 h-2 w-2 rounded-full border-2 border-white bg-red-500" />
-          </button>
+          </button> */}
 
           <button
             type="button"
@@ -119,7 +129,7 @@ export function Header({ setMobileOpen }: HeaderProps) {
         </div>
       </header>
 
-      {notificationsOpen && (
+      {/* {notificationsOpen && (
         <NotificationsPanel
           close={() => setNotificationsOpen(false)}
           navigate={(next) => {
@@ -127,7 +137,7 @@ export function Header({ setMobileOpen }: HeaderProps) {
             navigate(next === "" || next === "overview" ? "/" : `/${next}`);
           }}
         />
-      )}
+      )} */}
 
       {profileOpen && <ProfileModal close={() => setProfileOpen(false)} />}
     </>

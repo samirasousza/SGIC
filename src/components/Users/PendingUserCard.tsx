@@ -1,11 +1,9 @@
-import { useEffect, useState } from "react";
 import { translateRole } from "../../utils/translateRole";
-import type { CourseModel } from "../../models/projectModel";
-import { GetAllCourses } from "../../services/coursesService";
 import { formatCpf } from "../../utils/formatCpf";
 import { formatPhone } from "../../utils/formatPhone";
 import { Icon } from "../Icon";
 import { formatRequestDate } from "../../utils/formatRequestDate";
+import type { UserRole } from "../../types/userRoleType";
 
 export interface PendingUser {
   id: string;
@@ -15,10 +13,11 @@ export interface PendingUser {
   phone: string;
   degree: string;
   institution: string;
-  course: string;
+  course: string; // nome do curso
   requestedBy: string;
-  requesterRole: string;
+  requesterRole: UserRole;
   project: string;
+  reason: string;
   date: string;
 }
 
@@ -52,27 +51,8 @@ export function PendingUserCard({
   onRegister,
   onReject,
 }: PendingUserCardProps) {
-  const [courses, setCourses] = useState<CourseModel[]>([]);
-
   const cpf = formatCpf(request.cpf);
   const phone = formatPhone(request.phone);
-
-  useEffect(() => {
-    async function loadCourses() {
-      try {
-        const response = await GetAllCourses();
-        setCourses(response);
-      } catch (error) {
-        console.error("Erro ao carregar cursos:", error);
-      }
-    }
-
-    void loadCourses();
-  }, []);
-
-  const courseName =
-    courses.find((course) => course.id === request.course)?.name ??
-    "Curso não encontrado";
 
   return (
     <article className="rounded-xl border border-gray-200 bg-white p-5 transition hover:border-gray-300">
@@ -107,7 +87,7 @@ export function PendingUserCard({
           <InfoItem label="Telefone" value={phone} />
           <InfoItem label="Titulação" value={request.degree} />
           <InfoItem label="Instituição" value={request.institution} />
-          <InfoItem label="Curso" value={courseName} />
+          <InfoItem label="Curso" value={request.course} />
         </div>
       </section>
 
@@ -130,6 +110,11 @@ export function PendingUserCard({
           <InfoItem
             label="Projeto vinculado"
             value={request.project}
+            className="sm:col-span-2 lg:col-span-3"
+          />
+          <InfoItem
+            label="Motivo da solicitação"
+            value={request.reason}
             className="sm:col-span-2 lg:col-span-3"
           />
         </div>

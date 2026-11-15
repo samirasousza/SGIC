@@ -14,6 +14,8 @@ interface Board {
   location: string;
   first: string;
   second: string;
+  secondAwaiting: boolean;
+  secondName: string;
   status: string;
 }
 
@@ -30,8 +32,7 @@ export function BoardStageCard({
   onEdit,
   onCancel,
   onSave,
-  // onApprove,
-  onExternal,
+  onAwaitingChange,
 }: {
   stage: Stage;
   board: Board;
@@ -45,8 +46,7 @@ export function BoardStageCard({
   onEdit: () => void;
   onCancel: () => void;
   onSave: () => void;
-  // onApprove: () => void;
-  onExternal: () => void;
+  onAwaitingChange: (awaiting: boolean) => void;
 }) {
   const title = stage === "partial" ? "Defesa parcial" : "Defesa final";
 
@@ -116,12 +116,12 @@ export function BoardStageCard({
             {canDefine && board.status === "Sugerida" && (
               <Button
                 icon="check"
-                disabled={
-                  !board.date ||
-                  !board.time ||
-                  !board.first.trim() ||
-                  !board.second.trim()
-                }
+                // disabled={
+                //   !board.date ||
+                //   !board.time ||
+                //   !board.first.trim() ||
+                //   !board.second.trim()
+                // }
                 onClick={onSave}
               >
                 {canDefine ? "Salvar alterações" : "Enviar sugestão"}
@@ -185,18 +185,42 @@ export function BoardStageCard({
               options={evaluatorOptions}
             />
 
-            <SearchableInput
-              label="Avaliador externo"
-              value={board.second}
-              onChange={(value) => onChange("second", value)}
-              options={evaluatorOptions}
-            />
-          </div>
+            {!board.secondAwaiting ? (
+              <SearchableInput
+                label="Avaliador externo"
+                value={board.second}
+                onChange={(value) => onChange("second", value)}
+                options={evaluatorOptions}
+              />
+            ) : (
+              <label className="flex flex-col gap-2">
+                <span className="text-sm font-medium text-slate-700">
+                  Nome da pessoa sugerida (aguardando cadastro)
+                </span>
+                <input
+                  value={board.secondName}
+                  onChange={(event) =>
+                    onChange("secondName", event.target.value)
+                  }
+                  placeholder="Ex.: Dra. Ana Souza (INPA)"
+                  className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
+                />
+              </label>
+            )}
 
-          <div className="border-t border-slate-100 pt-4">
-            <Button variant="ghost" icon="user-plus" onClick={onExternal}>
-              Solicitar cadastro de avaliador externo
-            </Button>
+            <label className="flex cursor-pointer items-center gap-2 text-sm text-slate-600">
+              <input
+                type="checkbox"
+                checked={board.secondAwaiting}
+                onChange={(event) => onAwaitingChange(event.target.checked)}
+              />
+              Pessoa sugerida ainda sem cadastro
+            </label>
+
+            <p className="text-xs text-slate-400">
+              Todos os campos são opcionais. Você pode salvar a banca
+              incompleta.
+            </p>
           </div>
 
           {/* Ações */}
@@ -207,12 +231,12 @@ export function BoardStageCard({
 
             <Button
               icon="check"
-              disabled={
-                !board.date ||
-                !board.time ||
-                !board.first.trim() ||
-                !board.second.trim()
-              }
+              // disabled={
+              //   !board.date ||
+              //   !board.time ||
+              //   !board.first.trim() ||
+              //   !board.second.trim()
+              // }
               onClick={onSave}
             >
               {canDefine ? "Salvar alterações" : "Enviar sugestão"}
@@ -256,7 +280,11 @@ export function BoardStageCard({
                     index="02"
                     name={board.second}
                     status={
-                      board.status === "Definida" ? "Definido" : "Sugerido"
+                      board.secondAwaiting
+                        ? "Aguardando cadastro"
+                        : board.status === "Definida"
+                          ? "Definido"
+                          : "Sugerido"
                     }
                   />
                 )}

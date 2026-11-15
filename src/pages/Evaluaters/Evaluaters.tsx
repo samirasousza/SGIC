@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { Breadcrumbs } from "../../components/Breadcrumbs";
@@ -10,18 +10,23 @@ import { Button } from "../../components/Button";
 
 import { useAppContext } from "../../contexts/appContext";
 
+import { GetProjectDetails } from "../../services/projectService";
+import { getTeachers } from "../../services/userService";
 import {
-  GetProjectDetails,
   GetProjectBoard,
   RegisterProjectBoard,
-} from "../../services/projectService";
-
-import { getTeachers } from "../../services/userService";
+} from "../../services/BoardService";
 
 import type { ProjectDetailsModel } from "../../models/projectModel";
-import type { ProjectBoardMemberModel } from "../../models/projectBoardModel";
-import type { DefenseType } from "../../types/defenseType";
 import type { TeacherModel } from "../../models/userModel";
+import type {
+  BoardMemberModel,
+  DefenseBoardModel,
+  RegisterProjectBoardModel,
+} from "../../models/projectBoardModel";
+import type { DefenseType } from "../../types/defenseType";
+import { registerUserRequest } from "../../services/userRequestssService";
+import { getApiError } from "../../utils/apiErrorResponse";
 
 type Stage = "partial" | "final";
 
@@ -31,6 +36,8 @@ interface BoardForm {
   location: string;
   first: string;
   second: string;
+  secondAwaiting: boolean;
+  secondName: string;
   status: string;
 }
 
@@ -42,6 +49,8 @@ const initialBoard: BoardForm = {
   location: "",
   first: "",
   second: "",
+  secondAwaiting: false,
+  secondName: "",
   status: "Pendente",
 };
 
@@ -49,35 +58,39 @@ function getDefenseType(stage: Stage): DefenseType {
   return stage === "partial" ? "PARTIAL" : "FINAL";
 }
 
-function getStage(defenseType: DefenseType): Stage {
-  return defenseType === "PARTIAL" ? "partial" : "final";
-}
-
 function getEvaluatorLabel(evaluator: { name: string; email: string }) {
   return `${evaluator.name} (${evaluator.email})`;
 }
 
-function mapBoardsToState(members: ProjectBoardMemberModel[]): BoardsState {
-  const result: BoardsState = {
-    partial: { ...initialBoard },
-    final: { ...initialBoard },
+function memberLabel(member: BoardMemberModel) {
+  return member.evaluator
+    ? getEvaluatorLabel(member.evaluator)
+    : `${member.suggestedName ?? ""} (aguardando cadastro)`;
+}
+
+function toBoardForm(defense?: DefenseBoardModel): BoardForm {
+  if (!defense) return { ...initialBoard };
+
+  const internal = defense.members.find((m) => m.memberType === "INTERNAL");
+  const external = defense.members.find((m) => m.memberType === "EXTERNAL");
+
+  return {
+    date: defense.defenseDate ?? "",
+    time: defense.defenseTime?.slice(0, 5) ?? "",
+    location: defense.location ?? "",
+    first: internal ? memberLabel(internal) : "",
+    second: external ? memberLabel(external) : "",
+    secondAwaiting: !!external?.awaitingRegistration,
+    secondName: external?.suggestedName ?? "",
+    status: defense.members.length ? "Sugerida" : "Pendente",
   };
+}
 
-  for (const member of members) {
-    const stage = getStage(member.defenseType);
-
-    if (member.memberType === "INTERNAL") {
-      result[stage].first = getEvaluatorLabel(member.evaluator);
-    }
-
-    if (member.memberType === "EXTERNAL") {
-      result[stage].second = getEvaluatorLabel(member.evaluator);
-    }
-
-    result[stage].status = "Sugerida";
-  }
-
-  return result;
+function mapBoardsToState(defenses: DefenseBoardModel[]): BoardsState {
+  return {
+    partial: toBoardForm(defenses.find((d) => d.defenseType === "PARTIAL")),
+    final: toBoardForm(defenses.find((d) => d.defenseType === "FINAL")),
+  };
 }
 
 export function EvaluatorsPage() {
@@ -86,7 +99,7 @@ export function EvaluatorsPage() {
   const { selectedRole } = useAppContext();
 
   const [project, setProject] = useState<ProjectDetailsModel | null>(null);
-  const [members, setMembers] = useState<ProjectBoardMemberModel[]>([]);
+  const [defenses, setDefenses] = useState<DefenseBoardModel[]>([]);
   const [teachers, setTeachers] = useState<TeacherModel[]>([]);
 
   const [boards, setBoards] = useState<BoardsState>({
@@ -101,135 +114,163 @@ export function EvaluatorsPage() {
   const [editingStage, setEditingStage] = useState<Stage | null>(null);
   const [savedStage, setSavedStage] = useState<Stage | null>(null);
   const [externalOpen, setExternalOpen] = useState(false);
+  const [externalStage, setExternalStage] = useState<Stage | null>(null);
 
-  const loadData = useCallback(async () => {
-    if (!projectId) {
-      setError("Identificador do projeto não informado.");
-      setLoading(false);
-      return;
-    }
+  const members = defenses.flatMap((d) => d.members);
 
-    setLoading(true);
-    setError(null);
-
-    try {
-      const [projectData, boardData, teacherData] = await Promise.all([
-        GetProjectDetails(projectId),
-        GetProjectBoard(projectId),
-        getTeachers(),
-      ]);
-
-      setProject(projectData);
-      setMembers(boardData);
-      setTeachers(teacherData);
-      setBoards(mapBoardsToState(boardData));
-    } catch {
-      setError("Não foi possível carregar os dados da banca.");
-    } finally {
-      setLoading(false);
-    }
-  }, [projectId]);
+  const errorRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    void loadData();
-  }, [loadData]);
+    if (error)
+      errorRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, [error]);
+
+  useEffect(() => {
+    if (!projectId) return;
+
+    let cancelled = false;
+
+    Promise.all([
+      GetProjectDetails(projectId),
+      GetProjectBoard(projectId),
+      getTeachers(),
+    ])
+      .then(([projectData, boardData, teacherData]) => {
+        if (cancelled) return;
+
+        setProject(projectData);
+        setDefenses(boardData);
+        setTeachers(teacherData);
+        setBoards(mapBoardsToState(boardData));
+        setError(null);
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setError("Não foi possível carregar os dados da banca.");
+        }
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [projectId]);
 
   const isCommittee =
     selectedRole === "LOCAL_COMMITTEE" || selectedRole === "TECHNICAL_SUPPORT";
 
   const canSuggest = selectedRole === "ADVISOR";
-  // || selectedRole === "COADVISOR";
-
   const canDefine = isCommittee;
 
+  // Só avaliadores cadastrados entram nas opções (sugestões sem cadastro não).
   const evaluatorOptions = [
     ...new Set([
       ...teachers.map(getEvaluatorLabel),
-      ...members.map((member) => getEvaluatorLabel(member.evaluator)),
+      ...members.filter((m) => m.evaluator).map(memberLabel),
     ]),
   ];
 
   function updateBoard(stage: Stage, field: keyof BoardForm, value: string) {
+    setError(null); // some o erro ao editar qualquer campo
     setBoards((current) => ({
       ...current,
       [stage]: {
         ...current[stage],
         [field]: value,
+        ...(field === "second"
+          ? { secondAwaiting: false, secondName: "" }
+          : {}),
       },
     }));
   }
 
-  function findEvaluatorId(
-    label: string,
-    memberType: "INTERNAL" | "EXTERNAL",
-    stage: Stage,
-  ): string | undefined {
-    const teacher = teachers.find((item) => getEvaluatorLabel(item) === label);
+  function setAwaiting(stage: Stage, awaiting: boolean) {
+    setError(null);
+    setBoards((current) => ({
+      ...current,
+      [stage]: {
+        ...current[stage],
+        secondAwaiting: awaiting,
+        second: "",
+        secondName: awaiting ? current[stage].secondName : "",
+      },
+    }));
+  }
 
+  function findEvaluatorId(label: string): string | undefined {
+    const teacher = teachers.find((t) => getEvaluatorLabel(t) === label);
     if (teacher) return teacher.id;
 
-    const existingMember = members.find(
-      (member) =>
-        member.defenseType === getDefenseType(stage) &&
-        member.memberType === memberType &&
-        getEvaluatorLabel(member.evaluator) === label,
-    );
-
-    return existingMember?.evaluator.id;
+    return members.find(
+      (m) => m.evaluator && getEvaluatorLabel(m.evaluator) === label,
+    )?.evaluator?.id;
   }
 
   async function save(stage: Stage) {
     if (!projectId) return;
 
     const board = boards[stage];
+    const type = getDefenseType(stage);
 
-    const internalEvaluatorId = findEvaluatorId(board.first, "INTERNAL", stage);
-
-    const externalEvaluatorId = findEvaluatorId(
-      board.second,
-      "EXTERNAL",
-      stage,
-    );
-
-    if (!internalEvaluatorId || !externalEvaluatorId) {
-      setError(
-        "Não foi possível identificar os IDs dos avaliadores selecionados. Selecione novamente os avaliadores.",
-      );
+    const internalId = board.first ? findEvaluatorId(board.first) : undefined;
+    if (board.first && !internalId) {
+      setError("Avaliador interno não identificado. Selecione novamente.");
       return;
+    }
+
+    let external: RegisterProjectBoardModel["external"] = null;
+
+    if (board.secondAwaiting) {
+      if (!board.secondName.trim()) {
+        setError("Informe o nome da pessoa sugerida que aguarda cadastro.");
+        return;
+      }
+      external = {
+        awaitingRegistration: true,
+        suggestedName: board.secondName.trim(),
+      };
+    } else if (board.second) {
+      const id = findEvaluatorId(board.second);
+      if (!id) {
+        setError("Avaliador externo não identificado. Selecione novamente.");
+        return;
+      }
+      external = { evaluatorId: id, awaitingRegistration: false };
     }
 
     setSaving(true);
     setError(null);
 
     try {
-      const updatedMembers = await RegisterProjectBoard(
-        projectId,
-        getDefenseType(stage),
-        {
-          internalEvaluatorId,
-          externalEvaluatorId,
-        },
-      );
+      const updated = await RegisterProjectBoard(projectId, type, {
+        internal: internalId ? { evaluatorId: internalId } : null,
+        external,
+        defenseDate: board.date || null,
+        defenseTime: board.time || null,
+        location: board.location.trim() || null,
+      });
 
-      setMembers((current) => [
-        ...current.filter(
-          (member) => member.defenseType !== getDefenseType(stage),
-        ),
-        ...updatedMembers,
+      setDefenses((current) => [
+        ...current.filter((d) => d.defenseType !== type),
+        updated,
       ]);
-
-      setBoards((current) => ({
-        ...current,
-        [stage]: {
-          ...current[stage],
-          status: "Sugerida",
-        },
-      }));
-
+      setBoards((current) => ({ ...current, [stage]: toBoardForm(updated) }));
       setEditingStage(null);
       setSavedStage(stage);
-    } catch {
-      setError("Não foi possível salvar a composição da banca.");
+    } catch (err) {
+      const { message, fieldErrors } = getApiError(err);
+
+      setError(
+        Object.keys(fieldErrors).length
+          ? Object.entries(fieldErrors)
+              .map(([field, msg]) => `${field}: ${msg}`)
+              .join(" · ")
+          : message,
+      );
     } finally {
       setSaving(false);
     }
@@ -260,14 +301,11 @@ export function EvaluatorsPage() {
 
   if (!project) return null;
 
-  // O modelo atual do projeto não possui um campo de status de arquivamento
-  // nem progresso percentual. Por isso, não é possível reproduzir essas
-  // duas regras do mock com segurança.
   const archived = false;
   const locked = false;
 
   return (
-    <>
+    <div className="space-y-5">
       <Breadcrumbs
         items={[
           { label: "Início", onClick: () => navigate("/") },
@@ -276,7 +314,7 @@ export function EvaluatorsPage() {
             label: project.title,
             onClick: () => navigate(`/projects/${project.id}`),
           },
-          { label: "Banca" },
+          { label: "Bancas" },
         ]}
       />
 
@@ -288,12 +326,43 @@ export function EvaluatorsPage() {
               ? "Sugestão de banca"
               : "Bancas do projeto"
         }
-        description={`${project.title} • ${project.student.name}`}
       />
 
+      {canSuggest && (
+        <div className="mb-5 flex flex-wrap justify-end gap-2">
+          <Button
+            variant="secondary"
+            icon="user-plus"
+            onClick={() => {
+              setExternalStage("partial");
+              setExternalOpen(true);
+            }}
+          >
+            Solicitar cadastro de avaliador externo
+          </Button>
+
+          <Button
+            variant="secondary"
+            icon="clock"
+            onClick={() =>
+              navigate(`/projects/${project.id}/evaluators/requests`)
+            }
+          >
+            Minhas solicitações
+          </Button>
+        </div>
+      )}
+
       {error && (
-        <div className="mb-5 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
-          {error}
+        <div
+          ref={errorRef}
+          role="alert"
+          className="mb-5 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700"
+        >
+          <strong className="block font-semibold">
+            Não foi possível salvar a banca
+          </strong>
+          <p className="mt-1 break-words">{error}</p>
         </div>
       )}
 
@@ -342,31 +411,50 @@ export function EvaluatorsPage() {
             locked={locked}
             evaluatorOptions={evaluatorOptions}
             onChange={(field, value) => updateBoard(stage, field, value)}
+            onAwaitingChange={(awaiting) => setAwaiting(stage, awaiting)}
             onEdit={() => {
               setEditingStage(stage);
               setSavedStage(null);
               setError(null);
             }}
-            onCancel={() => setEditingStage(null)}
+            onCancel={() => {
+              setEditingStage(null);
+              // descarta o que foi digitado e volta ao que está salvo
+              setBoards((current) => ({
+                ...current,
+                [stage]: toBoardForm(
+                  defenses.find((d) => d.defenseType === getDefenseType(stage)),
+                ),
+              }));
+            }}
             onSave={() => void save(stage)}
-            // onApprove={() => void save(stage)}
-            onExternal={() => setExternalOpen(true)}
           />
         ))}
       </div>
 
-      {externalOpen && (
+      {externalOpen && externalStage && (
         <ExternalEvaluatorModal
           close={() => setExternalOpen(false)}
-          submit={(data) => {
-            console.log("Solicitação de avaliador externo:", data);
+          defaultReason={`Avaliador externo do projeto "${project.title}"`}
+          submit={async (data) => {
+            // Se falhar, o erro sobe para o modal (409 de e-mail/CPF, por exemplo).
+            await registerUserRequest({
+              ...data,
+              projectId: projectId ?? null,
+            });
+
+            setBoards((current) => ({
+              ...current,
+              [externalStage]: {
+                ...current[externalStage],
+                second: "",
+                secondAwaiting: true,
+                secondName: data.name,
+              },
+            }));
             setExternalOpen(false);
           }}
         />
-        // <ExternalEvaluatorModal
-        //   close={() => setExternalOpen(false)}
-        //   submit={() => setExternalOpen(false)}
-        // />
       )}
 
       {saving && (
@@ -374,6 +462,6 @@ export function EvaluatorsPage() {
           Salvando banca...
         </div>
       )}
-    </>
+    </div>
   );
 }

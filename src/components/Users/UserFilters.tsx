@@ -39,7 +39,7 @@ export function UserFilters({ filters, onChange }: UserFiltersProps) {
         onChange={(e) =>
           update("profile", e.target.value as UserRole | "all")
         }
-        className="rounded-lg border border-gray-200 px-3 py-2.5 text-sm"
+        className="cursor-pointer rounded-lg border border-gray-200 px-3 py-2.5 text-sm"
       >
         <option value="all">Todos os perfis</option>
         {Object.entries(USER_ROLE_LABELS).map(([value, label]) => (
@@ -54,7 +54,7 @@ export function UserFilters({ filters, onChange }: UserFiltersProps) {
         onChange={(e) =>
           update("access", e.target.value as UserFiltersState["access"])
         }
-        className="rounded-lg border border-gray-200 px-3 py-2.5 text-sm"
+        className="cursor-pointer rounded-lg border border-gray-200 px-3 py-2.5 text-sm"
       >
         <option value="all">Todos os acessos</option>
         <option value="active">Ativo</option>
@@ -66,7 +66,7 @@ export function UserFilters({ filters, onChange }: UserFiltersProps) {
         onChange={(e) =>
           update("sort", e.target.value as UserFiltersState["sort"])
         }
-        className="rounded-lg border border-gray-200 px-3 py-2.5 text-sm"
+        className="cursor-pointer rounded-lg border border-gray-200 px-3 py-2.5 text-sm"
       >
         <option value="asc">Nome: A–Z</option>
         <option value="desc">Nome: Z–A</option>

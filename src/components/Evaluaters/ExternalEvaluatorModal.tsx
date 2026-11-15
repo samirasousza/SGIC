@@ -5,28 +5,25 @@ import { Button } from "../Button";
 import { Icon } from "../Icon";
 
 import type { CourseModel } from "../../models/projectModel";
+import type { AcademicTitleType } from "../../types/academicTitleType";
 import { GetAllCourses } from "../../services/coursesService";
 import { maskCpf } from "../../utils/maskCpf";
 import { maskPhone } from "../../utils/maskPhone";
+import { academicTitleOptions } from "../../utils/translateAcademicTitle";
+import type { RegisterUserRequestModel } from "../../models/UserRequestsModel";
 
-export interface ExternalEvaluatorData {
-  name: string;
-  email: string;
-  cpf: string;
-  phone: string;
-  degree: string;
-  institution: string;
-  courseId: string;
-}
+export type ExternalEvaluatorData = Omit<RegisterUserRequestModel, "projectId">;
 
 interface ExternalEvaluatorModalProps {
   close: () => void;
-  submit: (data: ExternalEvaluatorData) => void;
+  submit: (data: ExternalEvaluatorData) => Promise<void>;
+  defaultReason?: string;
 }
 
 export function ExternalEvaluatorModal({
   close,
   submit,
+  defaultReason = "",
 }: ExternalEvaluatorModalProps) {
   const [courses, setCourses] = useState<CourseModel[]>([]);
 
@@ -34,11 +31,14 @@ export function ExternalEvaluatorModal({
   const [email, setEmail] = useState("");
   const [cpf, setCpf] = useState("");
   const [phone, setPhone] = useState("");
-  const [degree, setDegree] = useState("Doutorado");
+  const [academicTitle, setAcademicTitle] =
+    useState<AcademicTitleType>("DOCTOR");
   const [institution, setInstitution] = useState("");
   const [courseId, setCourseId] = useState("");
+  const [reason, setReason] = useState(defaultReason);
 
   const [loadingCourses, setLoadingCourses] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -56,7 +56,7 @@ export function ExternalEvaluatorModal({
     void loadCourses();
   }, []);
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
 
@@ -67,26 +67,34 @@ export function ExternalEvaluatorModal({
       setError("Informe um CPF válido com 11 dígitos.");
       return;
     }
-
     if (phoneDigits.length !== 10 && phoneDigits.length !== 11) {
       setError("Informe um telefone válido com DDD.");
       return;
     }
-
     if (!courseId) {
       setError("Selecione o curso.");
       return;
     }
 
-    submit({
-      name: name.trim(),
-      email: email.trim(),
-      cpf: cpfDigits,
-      phone: phoneDigits,
-      degree,
-      institution: institution.trim(),
-      courseId,
-    });
+    try {
+      setSubmitting(true);
+      await submit({
+        name: name.trim(),
+        email: email.trim(),
+        cpf: cpfDigits,
+        phone: phoneDigits,
+        academicTitle,
+        institution: institution.trim(),
+        courseId,
+        reason: reason.trim(),
+      });
+    } catch {
+      setError(
+        "Não foi possível enviar a solicitação. Verifique se o e-mail ou o CPF já não estão cadastrados.",
+      );
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   const inputClass =
@@ -214,13 +222,17 @@ export function ExternalEvaluatorModal({
 
               <select
                 required
-                value={degree}
-                onChange={(event) => setDegree(event.target.value)}
+                value={academicTitle}
+                onChange={(event) =>
+                  setAcademicTitle(event.target.value as AcademicTitleType)
+                }
                 className={`${inputClass} cursor-pointer`}
               >
-                <option value="Doutorado">Doutorado</option>
-                <option value="Mestrado">Mestrado</option>
-                <option value="Especialização">Especialização</option>
+                {academicTitleOptions.map(([value, label]) => (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                ))}
               </select>
             </label>
 
@@ -271,6 +283,20 @@ export function ExternalEvaluatorModal({
                 </span>
               )}
             </label>
+
+            <label className="flex flex-col gap-2 sm:col-span-2">
+              <span className="text-sm font-medium text-slate-700">
+                Motivo da solicitação *
+              </span>
+              <textarea
+                required
+                rows={3}
+                value={reason}
+                onChange={(event) => setReason(event.target.value)}
+                placeholder="Ex.: avaliador externo do projeto X"
+                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
+              />
+            </label>
           </div>
 
           {error && (
@@ -281,16 +307,15 @@ export function ExternalEvaluatorModal({
 
           {/* Ações */}
           <div className="flex justify-end gap-2 border-t border-slate-100 px-6 py-4">
-            <Button variant="ghost" onClick={close}>
+            <Button type="button" variant="ghost" onClick={close}>
               Cancelar
             </Button>
-
             <Button
               type="submit"
               icon="check"
-              disabled={loadingCourses || courses.length === 0}
+              disabled={loadingCourses || courses.length === 0 || submitting}
             >
-              Enviar solicitação
+              {submitting ? "Enviando..." : "Enviar solicitação"}
             </Button>
           </div>
         </form>

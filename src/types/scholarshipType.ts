@@ -1,3 +1,1 @@
-export type ScholarshipType =
-  | "SCHOLARSHIP_HOLDER"
-  | "VOLUNTEER";
+export type ScholarshipType = "FAPEAM" | "UEA" | "CNPQ" | "VOLUNTEER";
