@@ -5,7 +5,7 @@ import type {
 } from "../models/projectBoardModel";
 import type { DefenseType } from "../types/defenseType";
 
-const API_URL_PROJECTS = `/projects`;
+const API_URL_PROJECTS = "/projects";
 
 export const GetProjectBoard = async (
   id: string,
@@ -23,3 +23,14 @@ export const RegisterProjectBoard = async (
       data,
     )
   ).data;
+
+export const RemoveProjectBoardMember = async (
+  projectId: string,
+  memberId: string,
+  justification: string,
+): Promise<void> => {
+  await api.post(
+    `${API_URL_PROJECTS}/${projectId}/board/members/${memberId}/remove`,
+    { justification },
+  );
+};

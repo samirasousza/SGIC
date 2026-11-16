@@ -4,15 +4,15 @@ export interface RegisterProjectBoardModel {
   internal?: { evaluatorId?: string | null } | null;
   external?: {
     evaluatorId?: string | null;
-    awaitingRegistration?: boolean; // só externo
-    suggestedName?: string | null; // obrigatório se awaitingRegistration
+    awaitingRegistration?: boolean;
+    suggestedName?: string | null;
   } | null;
-  defenseDate?: string | null; // "2026-12-10"
-  defenseTime?: string | null; // "14:30"
+  defenseDate?: string | null;
+  defenseTime?: string | null;
   location?: string | null;
 }
 
-interface EvaluatorInfo {
+export interface BoardPersonModel {
   id: string;
   name: string;
   email: string;
@@ -22,18 +22,21 @@ export interface BoardMemberModel {
   id: string;
   defenseType: DefenseType;
   memberType: BoardMemberType;
-  evaluator: EvaluatorInfo | null; // null se aguardando cadastro
+  evaluator: BoardPersonModel | null;
   awaitingRegistration: boolean;
   suggestedName: string | null;
-  invitedBy: EvaluatorInfo;
+  invitedBy: BoardPersonModel;
   invitedAt: string;
 }
 
-// Uma defesa (PARTIAL ou FINAL) com agendamento e membros.
 export interface DefenseBoardModel {
   defenseType: DefenseType;
-  defenseDate: string | null; // "2026-12-10"
-  defenseTime: string | null; // "14:30:00" (com segundos)
+  defenseDate: string | null;
+  defenseTime: string | null;
   location: string | null;
-  members: BoardMemberModel[]; // vaga vazia = membro ausente
+  members: BoardMemberModel[];
+}
+
+export interface RemoveProjectBoardMemberModel {
+  justification: string;
 }

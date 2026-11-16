@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { registerStudentInfo, userData } from "../services/loggedUserService";
+import { registerStudentInfo, userData } from "../services/meService";
 
 import {
   UserContext,

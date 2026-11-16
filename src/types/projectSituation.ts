@@ -1,4 +1,1 @@
-export type ProjectSituation =
-  | "UP_TO_DATE"
-  | "PENDING"
-  | "OVERDUE";
+export type ProjectSituation = "UP_TO_DATE" | "PENDING" | "OVERDUE"; // LATE

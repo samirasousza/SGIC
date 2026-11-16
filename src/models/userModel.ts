@@ -18,6 +18,7 @@ export interface UserModel {
   active: boolean;
   profileCompleted: boolean;
   mustChangePassword: boolean;
+  privacyAccepted: boolean;
 }
 
 export interface RegisterUserModel {
@@ -29,7 +30,16 @@ export interface RegisterUserModel {
   academicTitle?: AcademicTitleType | null;
   institution?: string | null;
   roles: UserRole[];
-  requestId?: string | null; // preenchido quando o cadastro vem de uma solicitação
+  requestId?: string | null;
+}
+
+export interface UpdateUserModel {
+  name: string;
+  email: string;
+  cpf?: string | null;
+  phone?: string | null;
+  registration?: string | null;
+  courseId?: string | null;
 }
 
 export interface TeacherModel {
@@ -45,8 +55,8 @@ export interface UserInfosUpdateModel {
   cpf: string;
   courseId: string;
   phone: string;
-  pcd: boolean;
-  hasDegree: boolean;
+  pcd?: boolean | null;
+  hasDegree?: boolean | null;
 }
 
 export interface UpdateUserRolesModel {
@@ -55,8 +65,10 @@ export interface UpdateUserRolesModel {
 
 export interface GetAllUsersParams {
   q?: string;
-  page: number;
-  size: number;
+  role?: UserRole;
+  active?: boolean;
+  page?: number;
+  size?: number;
   sort?: string[];
 }
 

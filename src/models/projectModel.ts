@@ -4,7 +4,6 @@ import type { ProjectSituation } from "../types/projectSituation";
 import type { ProjectSort } from "../types/projectSort";
 import type { ScholarshipType } from "../types/scholarshipType";
 import type { SortDirection } from "../types/sortDirection";
-
 export interface ProjectPersonModel {
   id: string;
   name: string;
@@ -23,12 +22,21 @@ export interface CourseModel {
   unit: UnitModel;
 }
 
+export interface TeacherModel {
+  id: string;
+  name: string;
+  email: string;
+  course: CourseModel | null;
+  academicTitle: AcademicTitleType | null;
+  institution: string | null;
+}
+
 export interface ProjectModel {
   id: string;
   sisprojNumber: string;
   title: string;
   cycle: string;
-  program: string;
+  program: ProjectProgram;
   scholarshipType: ScholarshipType;
   unit: UnitModel;
   student: ProjectPersonModel;
@@ -45,19 +53,12 @@ export interface ProjectDetailsModel {
   sisprojNumber: string;
   title: string;
   summary: string;
-  program: string;
+  program: ProjectProgram;
   scholarshipType: ScholarshipType;
   noticeNumber: string | null;
   cycle: string;
   unit: UnitModel;
-  advisor: {
-    id: string;
-    name: string;
-    email: string;
-    course: CourseModel | null;
-    academicTitle: AcademicTitleType | null;
-    institution: string | null;
-  };
+  advisor: TeacherModel;
   coAdvisor: ProjectPersonModel | null;
   student: {
     id: string;
@@ -81,21 +82,59 @@ export interface ProjectFilterOptionsModel {
   cycles: string[];
   studentCourses: CourseModel[];
   advisorCourses: CourseModel[];
-  programs: string[];
+  programs: ProjectProgram[];
   advisors: ProjectPersonModel[];
   units: UnitModel[];
 }
 
+/** Parâmetros aceitos pelo ProjectFilterDTO do backend. */
 export interface GetAllProjectsParams {
   cycle?: string;
-  q?: string; // Busca, sem diferenciar maiúsculas, no título, nome do aluno, nome do orientador e nº SISPROJ. Example : maria
+  q?: string;
   studentCourseId?: string;
   advisorCourseId?: string;
-  program?: ProjectProgram; // tipo de bolsa
-  scholarshipType?: ScholarshipType; // bolsista ou voluntário
-  situation?: ProjectSituation; //situação dos relatórios
+  program?: ProjectProgram;
+  scholarshipType?: ScholarshipType;
+  situation?: ProjectSituation;
   advisorId?: string;
   unitId?: string;
-  sort?: ProjectSort; // campo de ordenação
-  direction?: SortDirection; // direção da ordenação
+  sort?: ProjectSort;
+  direction?: SortDirection;
+}
+
+export interface ImportPersonModel {
+  name: string;
+  email: string;
+  registration?: string | null;
+}
+
+export interface ImportProjectModel {
+  sisprojNumber: string;
+  title: string;
+  summary?: string | null;
+  program: ProjectProgram;
+  scholarshipType: ScholarshipType;
+  noticeNumber?: string | null;
+  cycle: string;
+  area?: string | null;
+  subarea?: string | null;
+  startDate: string;
+  endDate: string;
+  unitAcronym: string;
+  student: ImportPersonModel;
+  advisor: ImportPersonModel;
+  coAdvisor?: ImportPersonModel | null;
+}
+
+export interface ImportProjectsModel {
+  projects: ImportProjectModel[];
+}
+
+export interface ImportResultModel {
+  created: number;
+  updated: number;
+  newUsers: Array<{
+    user: import("./userModel").UserModel;
+    temporaryPassword: string;
+  }>;
 }
