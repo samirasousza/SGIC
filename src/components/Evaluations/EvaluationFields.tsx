@@ -1,185 +1,133 @@
-import { isAdvisorRole } from "../../pages/Projects/Projects.utils";
-import type { UserRole } from "../../types/userRoleType";
+import type { EvaluationFormModel, SaveEvaluationModel } from "../../models/evaluationModel";
 import { ScoreField } from "./ScoreField";
 
-const fieldClass =
-  "flex flex-col gap-2 text-sm font-medium text-slate-700";
-
+const fieldClass = "flex flex-col gap-2 text-sm font-medium text-slate-700";
 const inputClass =
-  "w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm font-normal text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100";
-
+  "w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm font-normal text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 disabled:bg-slate-50";
 const textareaClass = `${inputClass} min-h-28 resize-y`;
 
-const selectClass =
-  "h-11 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm font-normal text-slate-700 outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100";
+interface EvaluationFieldsProps {
+  form: EvaluationFormModel;
+  value: SaveEvaluationModel;
+  disabled?: boolean;
+  onChange: (value: SaveEvaluationModel) => void;
+}
 
-export function EvaluationFields({ role }: { role: UserRole }) {
-  if (role === "STUDENT") {
-    return (
-      <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-        <label className={`${fieldClass} md:col-span-2`}>
-          Atividades realizadas no período
-          <textarea
-            className={textareaClass}
-            placeholder="Descreva as principais atividades desenvolvidas..."
-          />
-        </label>
+export function EvaluationFields({
+  form,
+  value,
+  disabled = false,
+  onChange,
+}: EvaluationFieldsProps) {
+  const updateItem = (
+    code: EvaluationFormModel["items"][number]["code"],
+    changes: { score?: number | null; notApplicable?: boolean },
+  ) => {
+    const currentItems = form.items.filter((item) => item.scale !== "COMPUTED").map((item) => {
+      const current = value.items?.find((entry) => entry.code === item.code);
+      return {
+        code: item.code,
+        score: current ? current.score : item.score,
+        notApplicable: current ? current.notApplicable : item.notApplicable,
+      };
+    });
 
-        <label className={`${fieldClass} md:col-span-2`}>
-          Resultados alcançados
-          <textarea
-            className={textareaClass}
-            placeholder="Apresente os resultados obtidos até esta etapa..."
-          />
-        </label>
+    onChange({
+      ...value,
+      items: currentItems.map((item) =>
+        item.code === code ? { ...item, ...changes } : item,
+      ),
+    });
+  };
 
-        <label className={`${fieldClass} md:col-span-2`}>
-          Dificuldades encontradas
-          <textarea
-            className={textareaClass}
-            placeholder="Registre dificuldades técnicas, acadêmicas ou operacionais..."
-          />
-        </label>
-
-        <label className={fieldClass}>
-          Participação no projeto
-          <select defaultValue="" className={selectClass}>
-            <option value="" disabled>
-              Selecione
-            </option>
-            <option>Muito satisfatória</option>
-            <option>Satisfatória</option>
-            <option>Parcialmente satisfatória</option>
-          </select>
-        </label>
-
-        <label className={fieldClass}>
-          Carga horária média semanal
-          <input
-            className={inputClass}
-            placeholder="Ex.: 12 horas"
-          />
-        </label>
-      </div>
-    );
-  }
-
-  if (isAdvisorRole(role)) {
-    return (
-      <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-        <label className={fieldClass}>
-          Cumprimento do plano de trabalho
-          <select defaultValue="" className={selectClass}>
-            <option value="" disabled>
-              Selecione
-            </option>
-            <option>Integral</option>
-            <option>Parcial</option>
-            <option>Insuficiente</option>
-          </select>
-        </label>
-
-        <label className={fieldClass}>
-          Desempenho do aluno
-          <select defaultValue="" className={selectClass}>
-            <option value="" disabled>
-              Selecione
-            </option>
-            <option>Excelente</option>
-            <option>Bom</option>
-            <option>Regular</option>
-            <option>Insuficiente</option>
-          </select>
-        </label>
-
-        <label className={`${fieldClass} md:col-span-2`}>
-          Evolução acadêmica e científica
-          <textarea
-            className={textareaClass}
-            placeholder="Avalie a evolução do aluno no período..."
-          />
-        </label>
-
-        <label className={`${fieldClass} md:col-span-2`}>
-          Parecer e recomendações
-          <textarea
-            className={textareaClass}
-            placeholder="Registre seu parecer e as recomendações para a próxima etapa..."
-          />
-        </label>
-
-        <label className={fieldClass}>
-          Recomendação
-          <select className={selectClass}>
-            <option>Continuar o projeto</option>
-            <option>Continuar com ajustes</option>
-            <option>Não recomendar continuidade</option>
-          </select>
-        </label>
-      </div>
-    );
-  }
-
-  if (role === "EVALUATOR") {
-    return (
-      <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-        <ScoreField label="Qualidade e organização do trabalho" />
-        <ScoreField label="Adequação da metodologia" />
-        <ScoreField label="Consistência dos resultados" />
-        <ScoreField label="Apresentação e domínio do tema" />
-
-        <label className={`${fieldClass} md:col-span-2`}>
-          Parecer técnico
-          <textarea
-            className={textareaClass}
-            placeholder="Registre a fundamentação da sua avaliação..."
-          />
-        </label>
-
-        <label className={fieldClass}>
-          Resultado
-          <select className={selectClass}>
-            <option>Aprovado</option>
-            <option>Aprovado com ajustes</option>
-            <option>Não aprovado</option>
-          </select>
-        </label>
-      </div>
-    );
-  }
+  const sections = Array.from(new Set(form.items.map((item) => item.section)));
 
   return (
-    <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-      <label className={fieldClass}>
-        Documentação conferida
-        <select className={selectClass}>
-          <option>Sim, completa</option>
-          <option>Com pendências</option>
-        </select>
-      </label>
+    <div className="space-y-6">
+      {form.formType === "BOARD" && (
+        <label className={fieldClass}>
+          Tempo de apresentação (mm:ss)
+          <input
+            value={value.presentationTime ?? form.presentationTime ?? ""}
+            onChange={(event) =>
+              onChange({ ...value, presentationTime: event.target.value })
+            }
+            placeholder="Ex.: 13:45"
+            disabled={disabled}
+            className={inputClass}
+            inputMode="numeric"
+            pattern="[0-9]{1,3}:[0-5][0-9]"
+          />
+          <span className="text-xs font-normal text-slate-400">
+            A nota deste item é calculada automaticamente pelo sistema.
+          </span>
+        </label>
+      )}
+
+      {sections.map((section) => (
+        <section key={section} className="space-y-4">
+          <h3 className="border-b border-slate-100 pb-2 text-sm font-semibold text-slate-800">
+            {section}
+          </h3>
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+            {form.items
+              .filter((item) => item.section === section)
+              .map((item) => {
+                const current = value.items?.find((entry) => entry.code === item.code);
+                const score = current ? current.score : item.score;
+                const notApplicable = current ? current.notApplicable : item.notApplicable;
+
+                if (item.scale === "COMPUTED") {
+                  return (
+                    <div key={item.code} className={fieldClass}>
+                      {item.label}
+                      <div className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-3 text-sm font-normal text-slate-600">
+                        {score === null ? "A nota será calculada após informar o tempo." : `Nota calculada: ${score}`}
+                      </div>
+                    </div>
+                  );
+                }
+
+                return (
+                  <ScoreField
+                    key={item.code}
+                    label={item.label}
+                    value={score}
+                    allowedValues={item.allowedValues}
+                    notApplicable={notApplicable}
+                    disabled={disabled}
+                    onChange={(nextScore) =>
+                      updateItem(item.code, { score: nextScore, notApplicable: false })
+                    }
+                    onNotApplicableChange={
+                      item.allowsNotApplicable
+                        ? (checked) =>
+                            updateItem(item.code, {
+                              notApplicable: checked,
+                              score: checked ? null : score,
+                            })
+                        : undefined
+                    }
+                  />
+                );
+              })}
+          </div>
+        </section>
+      ))}
 
       <label className={fieldClass}>
-        Conformidade com o ciclo
-        <select className={selectClass}>
-          <option>Regular</option>
-          <option>Requer verificação</option>
-        </select>
-      </label>
-
-      <label className={`${fieldClass} md:col-span-2`}>
-        Observações de auditoria
+        Comentários
         <textarea
+          value={value.comments ?? form.comments ?? ""}
+          onChange={(event) => onChange({ ...value, comments: event.target.value })}
+          maxLength={5000}
+          disabled={disabled}
+          placeholder="Registre observações complementares, se necessário..."
           className={textareaClass}
-          placeholder="Registre ocorrências ou observações para auditoria..."
         />
-      </label>
-
-      <label className={fieldClass}>
-        Validação
-        <select className={selectClass}>
-          <option>Validar avaliação</option>
-          <option>Devolver para correção</option>
-        </select>
+        <span className="text-right text-xs font-normal text-slate-400">
+          {(value.comments ?? form.comments ?? "").length}/5000
+        </span>
       </label>
     </div>
   );

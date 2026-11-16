@@ -25,6 +25,8 @@ import { PendingUsersPage } from "../pages/Users/PedingUsers";
 import { SettingsPage } from "../pages/Settings/Settings";
 import { MyUserRequestsPage } from "../pages/Users/MyUserRequest";
 import { UserEditPage } from "../pages/Users/EditUsers";
+import { EvaluationsPage } from "../pages/Evalutions/Evaluations";
+import { ProjectEvaluationDetail } from "../pages/Evalutions/EvaluationDetail";
 
 function ScreenLoading() {
   return (
@@ -137,6 +139,12 @@ export function AppRoutes() {
           <Route
             path="/projects/:projectId/evaluators/requests"
             element={<MyUserRequestsPage />}
+          />
+
+          <Route path="/evaluations" element={<EvaluationsPage />} />
+          <Route
+            path="/projects/:projectId/evaluations"
+            element={<ProjectEvaluationDetail />}
           />
 
           {/* Rotas administrativas: somente ADMIN */}

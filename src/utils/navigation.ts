@@ -10,16 +10,16 @@ interface NavigationOption {
 export const navigationByRole: Record<UserRole, NavigationOption[]> = {
   STUDENT: [
     { screen: "", label: "Início", icon: "home" },
-    { screen: "projects", label: "Meus projetos", icon: "folder" },
+    { screen: "projects", label: "Meus projetos", icon: "file" },
     { screen: "reports", label: "Relatórios", icon: "file-text" },
   ],
 
   ADVISOR: [
     { screen: "", label: "Início", icon: "home" },
     { screen: "projects", label: "Meus projetos", icon: "folder" },
-    { screen: "reports", label: "Relatórios", icon: "file-text" },
-    { screen: "evaluations", label: "Avaliações", icon: "clipboard-check" },
-    { screen: "evaluators", label: "Avaliadores", icon: "users" },
+    { screen: "reports", label: "Relatórios", icon: "file" },
+    { screen: "evaluations", label: "Avaliações", icon: "clipboard" },
+    { screen: "evaluators", label: "Bancas", icon: "calendar-check" },
   ],
 
   // COADVISOR: [
@@ -27,38 +27,38 @@ export const navigationByRole: Record<UserRole, NavigationOption[]> = {
   //   { screen: "projects", label: "Meus projetos", icon: "folder" },
   //   { screen: "reports", label: "Relatórios", icon: "file-text" },
   //   { screen: "evaluations", label: "Avaliações", icon: "clipboard-check" },
-  //   { screen: "evaluators", label: "Avaliadores", icon: "users" },
+  //   { screen: "evaluators", label: "Bancas", icon: "users" },
   // ],
 
   EVALUATOR: [
     { screen: "", label: "Início", icon: "home" },
-    { screen: "evaluations", label: "Avaliações", icon: "clipboard-check" },
+    { screen: "evaluations", label: "Avaliações", icon: "clipboard" },
   ],
 
   LOCAL_COMMITTEE: [
     { screen: "", label: "Início", icon: "home" },
     { screen: "projects", label: "Projetos da unidade", icon: "folder" },
-    { screen: "reports", label: "Relatórios", icon: "file-text" },
-    { screen: "evaluations", label: "Avaliações", icon: "clipboard-check" },
-    { screen: "evaluators", label: "Avaliadores", icon: "users" },
+    { screen: "reports", label: "Relatórios", icon: "file" },
+    { screen: "evaluations", label: "Avaliações", icon: "clipboard" },
+    { screen: "evaluators", label: "Bancas", icon: "calendar-check" },
     { screen: "spreadsheets", label: "Planilhas", icon: "table" },
   ],
 
   TECHNICAL_SUPPORT: [
     { screen: "", label: "Início", icon: "home" },
     { screen: "projects", label: "Projetos da unidade", icon: "folder" },
-    { screen: "reports", label: "Relatórios", icon: "file-text" },
-    { screen: "evaluations", label: "Avaliações", icon: "clipboard-check" },
-    { screen: "evaluators", label: "Avaliadores", icon: "users" },
+    { screen: "reports", label: "Relatórios", icon: "file" },
+    { screen: "evaluations", label: "Avaliações", icon: "clipboard" },
+    { screen: "evaluators", label: "Bancas", icon: "calendar-check" },
     { screen: "spreadsheets", label: "Planilhas", icon: "table" },
   ],
 
   ADMIN: [
     { screen: "", label: "Início", icon: "home" },
     { screen: "projects", label: "Projetos", icon: "folder" },
-    { screen: "reports", label: "Relatórios", icon: "file-text" },
-    { screen: "evaluations", label: "Avaliações", icon: "clipboard-check" },
-    { screen: "evaluators", label: "Avaliadores", icon: "users" },
+    { screen: "reports", label: "Relatórios", icon: "file" },
+    { screen: "evaluations", label: "Avaliações", icon: "clipboard" },
+    { screen: "evaluators", label: "Bancas", icon: "calendar-check" },
     { screen: "spreadsheets", label: "Planilhas", icon: "table" },
     { screen: "users", label: "Usuários", icon: "users" },
     { screen: "settings", label: "Configurações", icon: "settings" },

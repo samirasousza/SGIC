@@ -1,3 +1,4 @@
+
 import type { ReactNode } from "react";
 
 export function Icon({ name, size = 20 }: { name: string; size?: number }) {
@@ -15,9 +16,7 @@ export function Icon({ name, size = 20 }: { name: string; size?: number }) {
       </>
     ),
     folder: (
-      <>
-        <path d="M3 6h7l2 2h9v11H3z" />
-      </>
+      <path d="M3 6h7l2 2h9v11H3z" />
     ),
     users: (
       <>
@@ -36,6 +35,13 @@ export function Icon({ name, size = 20 }: { name: string; size?: number }) {
         <path d="M16 3v4M8 3v4M3 10h18" />
       </>
     ),
+    "calendar-check": (
+      <>
+        <rect x="3" y="5" width="18" height="16" rx="2" />
+        <path d="M16 3v4M8 3v4M3 10h18" />
+        <path d="m9 15 2 2 4-4" />
+      </>
+    ),
     clipboard: (
       <>
         <path d="M9 5H6v17h12V5h-3" />
@@ -44,8 +50,12 @@ export function Icon({ name, size = 20 }: { name: string; size?: number }) {
       </>
     ),
     chart: (
+      <path d="M4 20V10M10 20V4M16 20v-7M22 20H2" />
+    ),
+    table: (
       <>
-        <path d="M4 20V10M10 20V4M16 20v-7M22 20H2" />
+        <rect x="3" y="4" width="18" height="16" rx="2" />
+        <path d="M3 10h18M3 15h18M9 4v16M15 4v16" />
       </>
     ),
     settings: (
@@ -112,7 +122,7 @@ export function Icon({ name, size = 20 }: { name: string; size?: number }) {
       strokeLinejoin="round"
       aria-hidden="true"
     >
-      {iconPaths[name]}
+      {iconPaths[name] ?? iconPaths.info}
     </svg>
   );
 }
