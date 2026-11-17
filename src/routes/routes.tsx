@@ -27,6 +27,8 @@ import { MyUserRequestsPage } from "../pages/Users/MyUserRequest";
 import { UserEditPage } from "../pages/Users/EditUsers";
 import { EvaluationsPage } from "../pages/Evalutions/Evaluations";
 import { ProjectEvaluationDetail } from "../pages/Evalutions/EvaluationDetail";
+import { ReportsPage } from "../pages/Reports/Reports";
+import { ProjectReportsDetail } from "../pages/Reports/ReportsDetail";
 
 function ScreenLoading() {
   return (
@@ -145,6 +147,12 @@ export function AppRoutes() {
           <Route
             path="/projects/:projectId/evaluations"
             element={<ProjectEvaluationDetail />}
+          />
+
+          <Route path="/reports" element={<ReportsPage />} />
+          <Route
+            path="/projects/:projectId/reports"
+            element={<ProjectReportsDetail />}
           />
 
           {/* Rotas administrativas: somente ADMIN */}

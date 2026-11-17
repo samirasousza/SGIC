@@ -2,249 +2,195 @@ import { useState } from "react";
 import { Badge } from "../Badge";
 import { Button } from "../Button";
 import { Icon } from "../Icon";
-import { isMentorRole } from "../../pages/Projects/Projects.utils";
-import type { UserRole } from "../../types/userRoleType";
+import type { ReportModel, ReportVersionModel } from "../../models/reportModel";
+import { DownloadReport, ReopenReport, ReviewReport as ReviewReportRequest } from "../../services/reportsService";
+
+function downloadBlob(blob: Blob, fileName: string) {
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = fileName;
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+  URL.revokeObjectURL(url);
+}
+
+function formatDate(value: string | null) {
+  if (!value) return "—";
+  return new Date(value).toLocaleString("pt-BR", {
+    dateStyle: "short",
+    timeStyle: "short",
+  });
+}
+
+function versionStatus(version: ReportVersionModel) {
+  if (!version.reviewDecision) return { label: "Aguardando revisão", tone: "warning" as const };
+  if (version.reviewDecision === "APPROVED") return { label: "Aprovada", tone: "success" as const };
+  return { label: "Ajustes solicitados", tone: "orange" as const };
+}
 
 export function ReportReview({
-  role,
-  name,
-  archived,
+  report,
+  canReview,
+  canReopen,
   close,
-  uploading,
+  onUpdated,
 }: {
-  role: UserRole;
-  name: string;
-  archived: boolean;
+  report: ReportModel;
+  canReview: boolean;
+  canReopen: boolean;
   close: () => void;
-  uploading: () => void;
+  onUpdated: (report: ReportModel) => void;
 }) {
-  const [commentSent, setCommentSent] = useState(false);
-  const [approved, setApproved] = useState(false);
+  const [comment, setComment] = useState("");
+  const [justification, setJustification] = useState("");
   const [showCommentForm, setShowCommentForm] = useState(false);
-  const [comment, setComment] = useState(
-    "Revise a discussão dos resultados e inclua as referências indicadas no comentário da página 8.",
-  );
+  const [showReopenForm, setShowReopenForm] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+
+  const title = report.type === "MONTHLY"
+    ? `Relatório mensal ${report.referenceMonth}`
+    : report.type === "PARTIAL" ? "Relatório parcial" : "Relatório final";
+  const awaitingReview = report.status === "UNDER_REVIEW" || report.status === "RESUBMITTED";
+  const latestVersion = report.versions[report.versions.length - 1];
+
+  async function review(decision: "APPROVED" | "CHANGES_REQUESTED") {
+    if (decision === "CHANGES_REQUESTED" && !comment.trim()) {
+      setError("Informe os ajustes necessários.");
+      return;
+    }
+
+    setSaving(true);
+    setError("");
+    try {
+      const updated = await ReviewReportRequest(report.id, {
+        decision,
+        ...(decision === "CHANGES_REQUESTED" ? { comment: comment.trim() } : {}),
+      });
+      onUpdated(updated);
+      setShowCommentForm(false);
+      setComment("");
+    } catch {
+      setError("Não foi possível registrar a revisão. Atualize a página e tente novamente.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function reopen() {
+    if (!justification.trim()) {
+      setError("Informe a justificativa para reabrir o relatório.");
+      return;
+    }
+
+    setSaving(true);
+    setError("");
+    try {
+      const updated = await ReopenReport(report.id, { justification: justification.trim() });
+      onUpdated(updated);
+      setShowReopenForm(false);
+      setJustification("");
+    } catch {
+      setError("Não foi possível reabrir o relatório. Verifique se ele está aprovado.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function downloadVersion(version: ReportVersionModel) {
+    try {
+      const blob = await DownloadReport(report.id, version.versionNumber);
+      downloadBlob(blob, version.fileName);
+    } catch {
+      setError(`Não foi possível baixar a versão ${version.versionNumber}.`);
+    }
+  }
 
   return (
-    <div className="fixed inset-0 z-[100] grid place-items-center p-5">
-      {/* Backdrop */}
-      <button
-        type="button"
-        className="absolute inset-0 w-full border-0 bg-[#051b28]/[0.58] backdrop-blur-[3px] cursor-pointer"
-        onClick={close}
-        aria-label="Fechar versões"
-      />
-
-      {/* Modal Container */}
-      <section className="relative z-10 w-full max-w-[720px] max-h-[calc(100vh-40px)] overflow-y-auto rounded-[14px] bg-white shadow-[0_24px_80px_rgba(5,27,40,0.25)]">
-        {/* Header */}
-        <div className="flex items-start justify-between border-b border-[#dce5e9] p-6 pb-[18px]">
+    <div className="fixed inset-0 z-[100] grid place-items-center p-4">
+      <button type="button" className="absolute inset-0 cursor-pointer bg-slate-950/50" onClick={close} aria-label="Fechar histórico" />
+      <section className="relative z-10 max-h-[calc(100vh-32px)] w-full max-w-3xl overflow-y-auto rounded-2xl bg-white shadow-2xl">
+        <header className="flex items-start justify-between border-b border-slate-100 p-6">
           <div>
-            <span className="text-xs font-bold uppercase tracking-[0.13em] text-[#176b91]">
-              Histórico do documento
-            </span>
-            <h2 className="mt-[5px] font-['Manrope',sans-serif] text-xl font-bold text-[#182b38]">
-              {name}
-            </h2>
-            <p className="mt-1 text-[9px] text-[#6c7f89]">
-              Biodiversidade de insetos aquáticos na Amazônia
-            </p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-indigo-600">Histórico do documento</p>
+            <h2 className="mt-1 text-xl font-semibold text-slate-900">{title}</h2>
+            <p className="mt-1 text-sm text-slate-500">{report.versions.length} versão(ões) enviada(s)</p>
           </div>
-          <button
-            type="button"
-            aria-label="Fechar"
-            onClick={close}
-            className="grid h-[34px] w-[34px] place-items-center rounded-[7px] border-0 bg-[#f4f7f8] text-[#6c7f89] hover:text-[#182b38] transition-colors cursor-pointer"
-          >
-            <Icon name="close" />
-          </button>
-        </div>
+          <button type="button" onClick={close} aria-label="Fechar" className="rounded-lg p-2 text-slate-500 hover:bg-slate-100"><Icon name="close" /></button>
+        </header>
 
-        {/* Body */}
-        <div className="p-6">
-          {/* Mensagem de sucesso */}
-          {(commentSent || approved) && (
-            <div className="mb-4 flex items-center gap-1.5 rounded-[7px] bg-[#eaf6ef] p-[9px_11px] text-[10px] font-semibold text-[#277a58]">
-              <Icon name="check" size={16} />
-              <span>
-                {approved
-                  ? "Relatório aprovado. A aluna foi notificada."
-                  : "Comentário enviado para a aluna."}
-              </span>
+        <div className="space-y-5 p-6">
+          {error && <p className="rounded-lg bg-red-50 p-3 text-sm text-red-700" role="alert">{error}</p>}
+
+          {report.versions.length === 0 ? (
+            <p className="py-8 text-center text-sm text-slate-500">Ainda não há versões enviadas.</p>
+          ) : (
+            <div className="divide-y divide-slate-100">
+              {[...report.versions].reverse().map((version) => {
+                const status = versionStatus(version);
+                return (
+                  <div key={version.versionNumber} className="flex flex-wrap items-start gap-3 py-4 first:pt-0">
+                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-indigo-50 text-xs font-bold text-indigo-700">V{version.versionNumber}</span>
+                    <div className="min-w-0 flex-1">
+                      <strong className="block break-all text-sm text-slate-800">{version.fileName}</strong>
+                      <p className="mt-1 text-xs text-slate-500">Enviada em {formatDate(version.submittedAt)}{version.submittedLate ? " • Enviada com atraso" : ""}</p>
+                      <div className="mt-2 flex flex-wrap items-center gap-2">
+                        <Badge tone={status.tone}>{status.label}</Badge>
+                        {version.reviewedAt && <span className="text-xs text-slate-500">Revisada em {formatDate(version.reviewedAt)}</span>}
+                        {version.reviewedBy && <span className="text-xs text-slate-500">por {version.reviewedBy.name}</span>}
+                      </div>
+                      {version.reviewComment && <p className="mt-3 rounded-r border-l-2 border-amber-400 bg-amber-50 p-3 text-sm text-slate-700">{version.reviewComment}</p>}
+                    </div>
+                    <Button variant="ghost" icon="download" onClick={() => downloadVersion(version)}>Baixar PDF</Button>
+                  </div>
+                );
+              })}
             </div>
           )}
 
-          {/* Lista de Versões */}
-          <div className="divide-y divide-[#dce5e9]">
-            {/* V4 */}
-            <div className="flex flex-wrap sm:flex-nowrap items-start gap-[11px] py-[13px] first:pt-0">
-              <span className="grid h-[29px] w-[29px] shrink-0 place-items-center rounded-full bg-[#277a58] text-[9px] font-bold text-white">
-                V4
-              </span>
-              <div className="min-w-0 flex-1">
-                <strong className="block text-[10px] text-[#182b38]">
-                  Versão aprovada sem ressalvas
-                </strong>
-                <small className="mt-[3px] block text-[8px] text-[#6c7f89]">
-                  Enviada em 20 mar 2026 às 09h08 • Aprovada em 20 mar 2026 às
-                  11h45
-                </small>
-                <span className="mt-2 block text-[9px] italic text-[#91a0a8]">
-                  Nenhum comentário adicionado pelo orientador.
-                </span>
-              </div>
-              <div className="ml-10 sm:ml-0 flex items-center gap-2">
-                <Badge tone="success">Aprovada</Badge>
-                <Button variant="ghost" icon="download">
-                  Baixar
-                </Button>
-              </div>
-            </div>
-
-            {/* V3 */}
-            <div className="flex flex-wrap sm:flex-nowrap items-start gap-[11px] py-[13px]">
-              <span className="grid h-[29px] w-[29px] shrink-0 place-items-center rounded-full bg-[#277a58] text-[9px] font-bold text-white">
-                V3
-              </span>
-              <div className="min-w-0 flex-1">
-                <strong className="block text-[10px] text-[#182b38]">
-                  Versão aprovada
-                </strong>
-                <small className="mt-[3px] block text-[8px] text-[#6c7f89]">
-                  Enviada em 18 mar 2026 às 10h14 • Aprovada em 18 mar 2026 às
-                  16h30
-                </small>
-                <p className="mt-2 rounded-r border-l-2 border-[#d6ad3d] bg-[#fff7d9] p-[9px_10px] text-[9px] leading-[1.5] text-[#314753]">
-                  Comentário: Relatório aprovado. Os ajustes solicitados foram
-                  atendidos e o documento está adequado para esta etapa.
-                </p>
-              </div>
-              <div className="ml-10 sm:ml-0 flex items-center gap-2">
-                <Badge tone="success">Aprovada</Badge>
-                <Button variant="ghost" icon="download">
-                  Baixar
-                </Button>
-              </div>
-            </div>
-
-            {/* V2 */}
-            <div className="flex flex-wrap sm:flex-nowrap items-start gap-[11px] py-[13px]">
-              <span className="grid h-[29px] w-[29px] shrink-0 place-items-center rounded-full bg-[#176b91] text-[9px] font-bold text-white">
-                V2
-              </span>
-              <div className="min-w-0 flex-1">
-                <strong className="block text-[10px] text-[#182b38]">
-                  Versão ajustada
-                </strong>
-                <small className="mt-[3px] block text-[8px] text-[#6c7f89]">
-                  Enviada em 16 mar 2026 às 19h42
-                </small>
-                <p className="mt-2 rounded-r border-l-2 border-[#d6ad3d] bg-[#fff7d9] p-[9px_10px] text-[9px] leading-[1.5] text-[#314753]">
-                  Comentário: Revise a discussão dos resultados e inclua as
-                  referências indicadas no comentário da página 8.
-                </p>
-              </div>
-              <div className="ml-10 sm:ml-0 flex items-center gap-2">
-                <Badge tone="warning">Ajustes</Badge>
-                <Button variant="ghost" icon="download">
-                  Baixar
-                </Button>
-              </div>
-            </div>
-
-            {/* V1 */}
-            <div className="flex flex-wrap sm:flex-nowrap items-start gap-[11px] py-[13px] last:pb-0">
-              <span className="grid h-[29px] w-[29px] shrink-0 place-items-center rounded-full bg-[#e9eef0] text-[9px] font-bold text-[#6c7f89]">
-                V1
-              </span>
-              <div className="min-w-0 flex-1">
-                <strong className="block text-[10px] text-[#182b38]">
-                  Primeiro envio
-                </strong>
-                <small className="mt-[3px] block text-[8px] text-[#6c7f89]">
-                  Enviada em 12 mar 2026 às 14h18
-                </small>
-                <p className="mt-2 rounded-r border-l-2 border-[#d6ad3d] bg-[#fff7d9] p-[9px_10px] text-[9px] leading-[1.5] text-[#314753]">
-                  Comentário: Detalhar a metodologia de coleta e reorganizar a
-                  seção de resultados.
-                </p>
-              </div>
-              <div className="ml-10 sm:ml-0 flex items-center gap-2">
-                <Badge>Substituída</Badge>
-                <Button variant="ghost" icon="download">
-                  Baixar
-                </Button>
-              </div>
-            </div>
-          </div>
-
-          {/* Área de Avaliação do Orientador */}
-          {isMentorRole(role) && !archived && (
-            <div className="mt-5 border-t border-[#dce5e9] pt-4">
+          {canReview && awaitingReview && latestVersion && (
+            <div className="border-t border-slate-100 pt-5">
               {showCommentForm ? (
-                <>
-                  <label
-                    className="mb-2 flex justify-between text-[13px] font-semibold text-[#182b38]"
-                    htmlFor="review-comment"
-                  >
-                    Comentários sobre os ajustes necessários
-                  </label>
-                  <textarea
-                    id="review-comment"
-                    value={comment}
-                    onChange={(event) => setComment(event.target.value)}
-                    placeholder="Descreva os ajustes que o aluno deve realizar..."
-                    className="w-full min-h-[90px] resize-y rounded-lg border border-[#dce5e9] p-3 text-xs text-[#182b38] outline-none transition focus:border-[#176b91] focus:ring-2 focus:ring-[#176b91]/10 placeholder:text-[#6c7f89]/60"
-                  />
-                  <div className="mt-2.5 grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    <Button
-                      variant="secondary"
-                      onClick={() => setShowCommentForm(false)}
-                    >
-                      Cancelar
-                    </Button>
-                    <Button
-                      disabled={!comment.trim()}
-                      onClick={() => {
-                        setCommentSent(true);
-                        setApproved(false);
-                        setShowCommentForm(false);
-                      }}
-                    >
-                      Enviar solicitação de ajustes
-                    </Button>
+                <div className="space-y-3">
+                  <label htmlFor="report-review-comment" className="block text-sm font-semibold text-slate-800">Comentários sobre os ajustes necessários</label>
+                  <textarea id="report-review-comment" value={comment} onChange={(event) => setComment(event.target.value)} rows={4} maxLength={5000} placeholder="Descreva os ajustes que o aluno deve realizar..." className="w-full resize-y rounded-lg border border-slate-200 p-3 text-sm outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100" />
+                  <div className="flex flex-wrap justify-end gap-2">
+                    <Button variant="secondary" onClick={() => setShowCommentForm(false)}>Cancelar</Button>
+                    <Button onClick={() => review("CHANGES_REQUESTED")} disabled={!comment.trim() || saving}>Enviar solicitação de ajustes</Button>
                   </div>
-                </>
-              ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  <Button
-                    variant="secondary"
-                    icon="check"
-                    onClick={() => {
-                      setApproved(true);
-                      setCommentSent(false);
-                    }}
-                  >
-                    Aprovar relatório
-                  </Button>
-                  <Button onClick={() => setShowCommentForm(true)}>
-                    Solicitar ajustes
-                  </Button>
                 </div>
+              ) : (
+                <div className="flex flex-wrap gap-2">
+                  <Button variant="secondary" icon="check" onClick={() => review("APPROVED")} disabled={saving}>Aprovar relatório</Button>
+                  <Button onClick={() => setShowCommentForm(true)}>Solicitar ajustes</Button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {canReopen && report.status === "APPROVED" && (
+            <div className="border-t border-slate-100 pt-5">
+              {showReopenForm ? (
+                <div className="space-y-3">
+                  <label htmlFor="report-reopen-justification" className="block text-sm font-semibold text-slate-800">Justificativa para reabertura</label>
+                  <textarea id="report-reopen-justification" value={justification} onChange={(event) => setJustification(event.target.value)} rows={3} maxLength={5000} placeholder="Informe por que este relatório precisa ser reaberto..." className="w-full resize-y rounded-lg border border-slate-200 p-3 text-sm outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100" />
+                  <div className="flex flex-wrap justify-end gap-2">
+                    <Button variant="secondary" onClick={() => setShowReopenForm(false)}>Cancelar</Button>
+                    <Button onClick={reopen} disabled={!justification.trim() || saving}>Confirmar reabertura</Button>
+                  </div>
+                </div>
+              ) : (
+                <Button variant="secondary" onClick={() => setShowReopenForm(true)}>Reabrir relatório</Button>
               )}
             </div>
           )}
         </div>
 
-        {/* Footer Actions */}
-        <div className="flex justify-end gap-2.5 border-t border-[#dce5e9] bg-[#fafcfc] p-[15px_24px]">
-          {role === "STUDENT" && !archived && (
-            <Button variant="secondary" icon="upload" onClick={uploading}>
-              Anexar nova versão
-            </Button>
-          )}
+        <footer className="flex justify-end border-t border-slate-100 bg-slate-50 p-4">
           <Button onClick={close}>Fechar</Button>
-        </div>
+        </footer>
       </section>
     </div>
   );
