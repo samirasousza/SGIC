@@ -1,14 +1,15 @@
-import type { CycleModel } from "../../models/cycleModel";
+import type { CycleModel } from "../models/cycleModel";
 import type {
   CourseModel,
   ImportResultModel,
   UnitModel,
-} from "../../models/projectModel";
+} from "../models/projectModel";
 
-export type SettingsSection = "cycles" | "catalog" | "import";
-export type SettingsFeedback =
-  | { type: "success" | "error"; message: string }
-  | null;
+export type SettingsSection = "cycles" | "catalog" | "import" | "emails";
+export type SettingsFeedback = {
+  type: "success" | "error";
+  message: string;
+} | null;
 
 export type CycleFormModel = {
   cycle: string;

@@ -182,7 +182,6 @@ export function SpreadsheetsPage() {
       />
       <PageHeader
         title="Planilhas consolidadas"
-        description="Gere os documentos oficiais para encaminhamento à PROPESP/CPPI, sem redigitação."
       />
 
       {cycleRequired && (
@@ -237,9 +236,6 @@ export function SpreadsheetsPage() {
           <h2 className="text-lg font-semibold text-slate-800">
             Modelos disponíveis
           </h2>
-          <p className="mt-1 text-sm text-slate-500">
-            Os títulos e a ordem das colunas seguem o modelo oficial.
-          </p>
         </div>
         <Badge tone="info">{spreadsheetDefinitions.length} planilhas</Badge>
       </div>

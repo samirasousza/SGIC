@@ -126,7 +126,6 @@ export function ReportsPage() {
 
       <PageHeader
         title="Relatórios por projeto"
-        description="Acompanhe a situação dos relatórios mensais, parcial e final dos projetos."
       />
 
       {pendingMyReview > 0 && (

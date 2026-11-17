@@ -1,4 +1,4 @@
-export function formatPhone(phone?: string) {
+export function formatPhone(phone?: string | null) {
   const digits = (phone ?? "").replace(/\D/g, "");
   if (digits.length === 11) {
     return digits.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");

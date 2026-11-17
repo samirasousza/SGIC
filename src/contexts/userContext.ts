@@ -1,8 +1,4 @@
-
-import {
-  createContext,
-  useContext,
-} from "react";
+import { createContext, useContext } from "react";
 
 import type { ReactNode } from "react";
 import type { UserRole } from "../types/userRoleType";
@@ -24,6 +20,7 @@ export interface UserContextData {
   hasRole: (role: UserRole) => boolean;
   refreshUser: () => Promise<UserModel | null>;
   completeProfile: (data: RegisterData) => Promise<void>;
+  acceptPrivacy: () => Promise<void>;
   clearUser: () => void;
 }
 

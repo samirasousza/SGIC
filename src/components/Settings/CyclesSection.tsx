@@ -1,7 +1,7 @@
 import type { CycleModel } from "../../models/cycleModel";
 import { Button } from "../Button";
 import { SettingsField } from "./SettingsField";
-import type { CycleFormModel } from "./settingsTypes";
+import type { CycleFormModel } from "../../types/settingsTypes";
 
 type CyclesSectionProps = {
   cycles: CycleModel[];
@@ -126,18 +126,14 @@ export function CyclesSection({
                 className="rounded-lg border border-gray-200 p-4"
               >
                 <div className="flex flex-wrap items-center justify-between gap-3">
-                  <h3 className="font-semibold text-gray-900">
-                    {cycle.cycle}
-                  </h3>
+                  <h3 className="font-semibold text-gray-900">{cycle.cycle}</h3>
                   <Button variant="table" onClick={() => onEdit(cycle)}>
                     Editar prazos
                   </Button>
                 </div>
                 <dl className="mt-3 grid gap-2 text-sm sm:grid-cols-3">
                   <div>
-                    <dt className="text-xs text-gray-500">
-                      Relatório parcial
-                    </dt>
+                    <dt className="text-xs text-gray-500">Relatório parcial</dt>
                     <dd className="mt-1 text-gray-800">
                       {cycle.partialReportDueDate || "Sem prazo"}
                     </dd>

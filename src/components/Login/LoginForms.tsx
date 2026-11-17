@@ -100,16 +100,6 @@ export function LoginForms({ onSubmit }: LoginFormsProps) {
           </Button>
         </div>
       </form>
-
-      {/* Nota de Segurança */}
-      <div className="flex gap-3 rounded-[10px] bg-canvas p-3.5 text-[13px] leading-relaxed text-muted">
-        <div className="shrink-0 text-blue">
-          <Icon name="info" size={18} />
-        </div>
-        <p className="m-0 text-xs text-muted">
-          Este acesso simula a autenticação institucional da UEA.
-        </p>
-      </div>
     </div>
   );
 }

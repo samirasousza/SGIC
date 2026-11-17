@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { Badge } from "../../components/Badge";
@@ -28,8 +28,9 @@ import type { ProjectDetailsModel } from "../../models/projectModel";
 import type { DefenseBoardModel } from "../../models/projectBoardModel";
 import type { DefenseType } from "../../types/defenseType";
 import { evaluationTitle } from "./EvaluationUtils";
-import { GetProjectBoard } from "../../services/BoardService";
 import { useAppContext } from "../../contexts/appContext";
+import { getApiError } from "../../utils/apiErrorResponse";
+import { GetProjectBoard } from "../../services/boardService";
 
 function initialDraft(form: EvaluationFormModel): SaveEvaluationModel {
   return {
@@ -83,8 +84,14 @@ export function ProjectEvaluationDetail() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const errorRef = useRef<HTMLParagraphElement>(null);
 
   const { selectedRole: role } = useAppContext();
+
+  useEffect(() => {
+    if (error)
+      errorRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, [error]);
 
   useEffect(() => {
     if (!projectId) return;
@@ -184,9 +191,11 @@ export function ProjectEvaluationDetail() {
       setForm(updated);
       setDraft(initialDraft(updated));
       await refreshOverview();
-    } catch {
+    } catch (saveError) {
+      const apiError = getApiError(saveError);
       setError(
-        "Não foi possível salvar a avaliação. Confira os campos e tente novamente.",
+        apiError.message ||
+          "Não foi possível salvar a avaliação. Confira os campos e tente novamente.",
       );
     } finally {
       setSaving(false);
@@ -273,7 +282,7 @@ export function ProjectEvaluationDetail() {
       <Breadcrumbs
         items={[
           { label: "Início", onClick: () => navigate("/") },
-          { label: "Projetos", onClick: () => navigate("/project") },
+          { label: "Projetos", onClick: () => navigate("/projects") },
           {
             label: project.title,
             onClick: () => navigate(`/projects/${project.id}`),
@@ -327,7 +336,11 @@ export function ProjectEvaluationDetail() {
       />
 
       {error && (
-        <p className="mt-5 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
+        <p
+          ref={errorRef}
+          role="alert"
+          className="mt-5 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+        >
           {error}
         </p>
       )}

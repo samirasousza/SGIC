@@ -24,6 +24,7 @@ import { FeedbackCard, type FeedbackData } from "../../components/FeedbackCard";
 import { Breadcrumbs } from "../../components/Breadcrumbs";
 import { Button } from "../../components/Button";
 import { translateRole } from "../../utils/translateRole";
+import { getUserFieldVisibility } from "../../utils/userFieldVisibility";
 
 const ADMIN_MANAGED_ROLES: UserRole[] = [
   "ADMIN",
@@ -158,6 +159,9 @@ export function UserEditPage() {
     setRoles(next);
     setFeedback(null);
   }
+
+  const { showStudentFields, showTeacherFields, showCourse } =
+    getUserFieldVisibility(user?.roles);
 
   const managedRoles = roles.filter((role) =>
     ADMIN_MANAGED_ROLES.includes(role),
@@ -430,41 +434,65 @@ export function UserEditPage() {
               />
             </label>
 
-            <label>
-              <span className="mb-1.5 block text-sm font-medium text-slate-700">
-                Curso
-              </span>
-              <select
-                value={form.courseId}
-                onChange={(event) => updateForm("courseId", event.target.value)}
-                disabled={loadingCourses}
-                className={`${inputClass} cursor-pointer`}
-              >
-                <option value="">Nenhum curso vinculado</option>
-                {courses.map((course) => (
-                  <option key={course.id} value={course.id}>
-                    {course.name}
-                  </option>
-                ))}
-              </select>
-            </label>
+            {showCourse && (
+              <label>
+                <span className="mb-1.5 block text-sm font-medium text-slate-700">
+                  Curso
+                </span>
+                <select
+                  value={form.courseId}
+                  onChange={(event) =>
+                    updateForm("courseId", event.target.value)
+                  }
+                  disabled={loadingCourses}
+                  className={`${inputClass} cursor-pointer`}
+                >
+                  <option value="">Nenhum curso vinculado</option>
+                  {courses.map((course) => (
+                    <option key={course.id} value={course.id}>
+                      {course.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            )}
           </div>
 
-          <div className="mt-5 grid gap-4 border-t border-slate-100 pt-5 sm:grid-cols-2 lg:grid-cols-3">
-            <InfoItem
-              label="Titulação"
-              value={
-                user.academicTitle
-                  ? academicTitleLabels[user.academicTitle]
-                  : null
-              }
-            />
-            <InfoItem label="Instituição" value={user.institution} />
-            <InfoItem
-              label="Perfil concluído"
-              value={user.profileCompleted ? "Sim" : "Não"}
-            />
-          </div>
+          {(showTeacherFields || showStudentFields) && (
+            <div className="mt-5 grid gap-4 border-t border-slate-100 pt-5 sm:grid-cols-2 lg:grid-cols-3">
+              {showTeacherFields && (
+                <>
+                  <InfoItem
+                    label="Titulação"
+                    value={
+                      user.academicTitle
+                        ? academicTitleLabels[user.academicTitle]
+                        : null
+                    }
+                  />
+                  <InfoItem label="Instituição" value={user.institution} />
+                </>
+              )}
+              {showStudentFields && (
+                <>
+                  <InfoItem
+                    label="Pessoa com deficiência"
+                    value={user.pcd == null ? null : user.pcd ? "Sim" : "Não"}
+                  />
+                  <InfoItem
+                    label="Possui graduação"
+                    value={
+                      user.hasDegree == null
+                        ? null
+                        : user.hasDegree
+                          ? "Sim"
+                          : "Não"
+                    }
+                  />
+                </>
+              )}
+            </div>
+          )}
 
           <div className="mt-5 flex justify-end border-t border-slate-100 pt-4">
             <Button

@@ -1,4 +1,3 @@
-
 import type { ReactNode } from "react";
 
 export function Icon({ name, size = 20 }: { name: string; size?: number }) {
@@ -15,9 +14,7 @@ export function Icon({ name, size = 20 }: { name: string; size?: number }) {
         <path d="M14 2v5h5M9 12h6M9 16h6" />
       </>
     ),
-    folder: (
-      <path d="M3 6h7l2 2h9v11H3z" />
-    ),
+    folder: <path d="M3 6h7l2 2h9v11H3z" />,
     users: (
       <>
         <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM17 11a4 4 0 0 0 0-8M22 21v-2a4 4 0 0 0-3-3.87" />
@@ -49,9 +46,7 @@ export function Icon({ name, size = 20 }: { name: string; size?: number }) {
         <path d="m9 14 2 2 4-5" />
       </>
     ),
-    chart: (
-      <path d="M4 20V10M10 20V4M16 20v-7M22 20H2" />
-    ),
+    chart: <path d="M4 20V10M10 20V4M16 20v-7M22 20H2" />,
     table: (
       <>
         <rect x="3" y="4" width="18" height="16" rx="2" />
@@ -108,6 +103,36 @@ export function Icon({ name, size = 20 }: { name: string; size?: number }) {
         <path d="M12 11v6M12 7h.01" />
       </>
     ),
+    "shield-check": (
+      <>
+        <path d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11Z" />
+        <path d="m9 12 2 2 4-4" />
+      </>
+    ),
+    "key-round": (
+      <>
+        <circle cx="8" cy="15" r="5" />
+        <path d="m11.5 11.5 9-9M17 6l2 2M14 9l2 2" />
+      </>
+    ),
+    edit: (
+      <>
+        <path d="m16 4 4 4M4 20l4-.8L19 8a2.1 2.1 0 0 0-3-3L5 16l-1 4Z" />
+      </>
+    ),
+    copy: (
+      <>
+        <rect x="8" y="8" width="12" height="12" rx="2" />
+        <path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3" />
+      </>
+    ),
+    "refresh-cw": (
+      <>
+        <path d="M20 7v5h-5M4 17v-5h5" />
+        <path d="M5.5 9A7 7 0 0 1 18 6l2 6M4 12l2 6a7 7 0 0 0 12.5-3" />
+      </>
+    ),
+    "arrow-left": <path d="m15 18-6-6 6-6M9 12h12" />,
   };
 
   return (

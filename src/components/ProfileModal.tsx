@@ -2,7 +2,9 @@ import { Icon } from "./Icon";
 import { useUser } from "../contexts/userContext";
 import { formatCpf } from "../utils/formatCpf";
 import { formatPhone } from "../utils/formatPhone";
+import { academicTitleLabels } from "../utils/translateAcademicTitle";
 import { translateRole } from "../utils/translateRole";
+import { getUserFieldVisibility } from "../utils/userFieldVisibility";
 import { useNavigate } from "react-router";
 
 interface ProfileModalProps {
@@ -14,19 +16,20 @@ export function ProfileModal({ close }: ProfileModalProps) {
 
   const navigate = useNavigate();
 
-  const isStudent = user?.roles.includes("STUDENT");
+  const { showStudentFields, showTeacherFields, showCourse } =
+    getUserFieldVisibility(user?.roles);
+
+  const yesNo = (value: boolean | null | undefined) =>
+    value == null ? "—" : value ? "Sim" : "Não";
 
   const data = [
     { label: "Nome completo", value: user?.name || "—" },
     { label: "E-mail institucional", value: user?.email || "—" },
     { label: "CPF", value: formatCpf(user?.cpf) },
     { label: "Telefone", value: formatPhone(user?.phone) },
-    ...(isStudent
+    { label: "Matrícula / registro", value: user?.registration || "—" },
+    ...(showCourse
       ? [
-          {
-            label: "Matrícula",
-            value: user?.registration || "—",
-          },
           { label: "Curso", value: user?.course?.name || "—" },
           {
             label: "Unidade",
@@ -34,6 +37,23 @@ export function ProfileModal({ close }: ProfileModalProps) {
               ? `${user.course.unit.acronym} - ${user.course.unit.name}`
               : "—",
           },
+        ]
+      : []),
+    ...(showTeacherFields
+      ? [
+          {
+            label: "Titulação",
+            value: user?.academicTitle
+              ? academicTitleLabels[user.academicTitle]
+              : "—",
+          },
+          { label: "Instituição", value: user?.institution || "—" },
+        ]
+      : []),
+    ...(showStudentFields
+      ? [
+          { label: "Pessoa com deficiência", value: yesNo(user?.pcd) },
+          { label: "Possui graduação", value: yesNo(user?.hasDegree) },
         ]
       : []),
   ];
@@ -51,13 +71,10 @@ export function ProfileModal({ close }: ProfileModalProps) {
         role="dialog"
         aria-modal="true"
         aria-labelledby="profile-title"
-        className="relative z-10 max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white shadow-2xl"
+        className="relative z-10 flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl"
       >
-        <div className="flex items-center justify-between border-b border-slate-100 px-6 py-5">
+        <div className="flex shrink-0 items-center justify-between border-b border-slate-100 px-6 py-5">
           <div>
-            <span className="text-xs font-semibold uppercase tracking-wider text-indigo-600">
-              Conta institucional
-            </span>
             <h2
               id="profile-title"
               className="mt-1 text-xl font-bold text-slate-900"
@@ -76,7 +93,7 @@ export function ProfileModal({ close }: ProfileModalProps) {
           </button>
         </div>
 
-        <div className="space-y-6 p-6">
+        <div className="min-h-0 flex-1 space-y-6 overflow-y-auto p-6">
           {loading && !user ? (
             <div className="grid gap-4 sm:grid-cols-2" aria-busy="true">
               {Array.from({ length: 4 }).map((_, i) => (
@@ -142,7 +159,7 @@ export function ProfileModal({ close }: ProfileModalProps) {
           </div>
         </div>
 
-        <div className="flex flex-col-reverse gap-3 border-t border-slate-100 px-6 py-4 sm:flex-row sm:justify-between">
+        <div className="flex shrink-0 flex-col-reverse gap-3 border-t border-slate-100 px-6 py-4 sm:flex-row sm:justify-between">
           <button
             type="button"
             onClick={() => {

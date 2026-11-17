@@ -1,5 +1,7 @@
 import type { BoardMemberType } from "../types/boardMemberType";
+import type { BoardSlotState } from "../types/boardSlotState";
 import type { DefenseType } from "../types/defenseType";
+import type { ProjectModel } from "./projectModel";
 export interface RegisterProjectBoardModel {
   internal?: { evaluatorId?: string | null } | null;
   external?: {
@@ -39,4 +41,22 @@ export interface DefenseBoardModel {
 
 export interface RemoveProjectBoardMemberModel {
   justification: string;
+}
+
+export interface BoardPanelSlotModel {
+  state: BoardSlotState;
+  name: string | null;
+}
+
+export interface BoardPanelModel {
+  rows: Array<{
+    project: ProjectModel;
+    defenses: Array<{
+      defenseType: DefenseType;
+      defenseDate: string | null;
+      defenseTime: string | null;
+      internal: BoardPanelSlotModel;
+      external: BoardPanelSlotModel;
+    }>;
+  }>;
 }

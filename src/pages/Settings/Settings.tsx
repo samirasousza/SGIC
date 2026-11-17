@@ -28,18 +28,15 @@ import { CyclesSection } from "../../components/Settings/CyclesSection";
 import { ImportProjectsSection } from "../../components/Settings/ImportProjectsSection";
 import { SettingsFeedback } from "../../components/Settings/SettingsFeedback";
 import { SettingsTabs } from "../../components/Settings/SettingsTabs";
-import {
-  emptyCourse,
-  emptyCycle,
-  emptyUnit,
-} from "../../components/Settings/settingsTypes";
+import { EmailsSection } from "../../components/Settings/EmailsSection";
+import { emptyCourse, emptyCycle, emptyUnit } from "../../types/settingsTypes";
 import type {
   CourseFormModel,
   CycleFormModel,
   SettingsFeedback as Feedback,
   SettingsSection,
   UnitFormModel,
-} from "../../components/Settings/settingsTypes";
+} from "../../types/settingsTypes";
 
 function getErrorMessage(error: unknown): string {
   if (typeof error === "object" && error !== null && "response" in error) {
@@ -309,7 +306,8 @@ export function SettingsPage() {
       <header>
         <h1 className="mt-1 text-2xl font-bold text-gray-900">Configurações</h1>
         <p className="mt-1 text-sm text-gray-500">
-          Gerencie ciclos acadêmicos, unidades, cursos e importações do SISPROJ.
+          Gerencie ciclos acadêmicos, unidades, cursos, importações do SISPROJ e
+          o histórico de e-mails.
         </p>
       </header>
 
@@ -380,6 +378,8 @@ export function SettingsPage() {
               onSubmit={handleImport}
             />
           )}
+
+          {section === "emails" && <EmailsSection />}
         </>
       )}
     </div>

@@ -1,4 +1,4 @@
-import type { SettingsFeedback as SettingsFeedbackType } from "./settingsTypes";
+import type { SettingsFeedback as SettingsFeedbackType } from "../../types/settingsTypes";
 
 type SettingsFeedbackProps = {
   feedback: SettingsFeedbackType;

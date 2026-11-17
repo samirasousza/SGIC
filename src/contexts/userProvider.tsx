@@ -1,6 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { registerStudentInfo, userData } from "../services/meService";
+import {
+  acceptPrivacyNotice,
+  registerStudentInfo,
+  userData,
+} from "../services/meService";
 
 import {
   UserContext,
@@ -47,6 +51,11 @@ export function UserProvider({ children }: UserProviderProps) {
     },
     [refreshUser],
   );
+
+  const acceptPrivacy = useCallback(async (): Promise<void> => {
+    const updated = await acceptPrivacyNotice();
+    setUser(updated);
+  }, []);
 
   const clearUser = useCallback(() => {
     setUser(null);
@@ -103,9 +112,19 @@ export function UserProvider({ children }: UserProviderProps) {
       hasRole,
       refreshUser,
       completeProfile,
+      acceptPrivacy,
       clearUser,
     }),
-    [user, loading, error, hasRole, refreshUser, completeProfile, clearUser],
+    [
+      user,
+      loading,
+      error,
+      hasRole,
+      refreshUser,
+      completeProfile,
+      acceptPrivacy,
+      clearUser,
+    ],
   );
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;

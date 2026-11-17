@@ -1,8 +1,6 @@
 import { Button } from "../Button";
 import { SettingsField } from "./SettingsField";
-import type {
-  CatalogSectionProps,
-} from "./settingsTypes";
+import type { CatalogSectionProps } from "../../types/settingsTypes";
 
 export function CatalogSection({
   units,
@@ -119,10 +117,7 @@ export function CatalogSection({
               </select>
             </label>
             <div className="flex flex-wrap gap-2">
-              <Button
-                type="submit"
-                disabled={saving || units.length === 0}
-              >
+              <Button type="submit" disabled={saving || units.length === 0}>
                 {saving
                   ? "Salvando..."
                   : editingCourseId
@@ -146,9 +141,7 @@ export function CatalogSection({
       <div className="grid gap-6 xl:grid-cols-2">
         <section className="rounded-xl border border-gray-200 bg-white p-5 sm:p-6">
           <div className="mb-4 flex items-center justify-between gap-3">
-            <h2 className="font-semibold text-gray-900">
-              Unidades acadêmicas
-            </h2>
+            <h2 className="font-semibold text-gray-900">Unidades acadêmicas</h2>
             <span className="text-xs text-gray-500">
               {units.length} cadastrada(s)
             </span>
@@ -163,9 +156,7 @@ export function CatalogSection({
                   <p className="truncate text-sm font-medium text-gray-900">
                     {unit.name}
                   </p>
-                  <p className="mt-0.5 text-xs text-gray-500">
-                    {unit.acronym}
-                  </p>
+                  <p className="mt-0.5 text-xs text-gray-500">{unit.acronym}</p>
                 </div>
                 <Button
                   variant="table"
@@ -189,9 +180,7 @@ export function CatalogSection({
             <h2 className="font-semibold text-gray-900">Cursos cadastrados</h2>
             <select
               value={courseUnitFilter}
-              onChange={(event) =>
-                onCourseUnitFilterChange(event.target.value)
-              }
+              onChange={(event) => onCourseUnitFilterChange(event.target.value)}
               className="cursor-pointer rounded-lg border border-gray-300 bg-white px-2.5 py-1.5 text-xs text-gray-700"
             >
               <option value="all">Todas as unidades</option>

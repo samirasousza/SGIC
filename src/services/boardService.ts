@@ -1,16 +1,28 @@
 import { api } from "../config/apiConfig";
 import type {
+  BoardPanelModel,
   DefenseBoardModel,
   RegisterProjectBoardModel,
 } from "../models/projectBoardModel";
+import type { GetAllProjectsParams } from "../models/projectModel";
 import type { DefenseType } from "../types/defenseType";
 
 const API_URL_PROJECTS = "/projects";
+const API_URL_BOARDS = "/boards";
 
 export const GetProjectBoard = async (
   id: string,
 ): Promise<DefenseBoardModel[]> =>
   (await api.get<DefenseBoardModel[]>(`${API_URL_PROJECTS}/${id}/board`)).data;
+
+export const GetBoardsPanel = async (
+  params?: GetAllProjectsParams,
+): Promise<BoardPanelModel> =>
+  (
+    await api.get<BoardPanelModel>(`${API_URL_BOARDS}/panel`, {
+      params,
+    })
+  ).data;
 
 export const RegisterProjectBoard = async (
   id: string,

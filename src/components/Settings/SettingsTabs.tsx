@@ -1,4 +1,4 @@
-import type { SettingsSection } from "./settingsTypes";
+import type { SettingsSection } from "../../types/settingsTypes";
 
 type SettingsTabsProps = {
   section: SettingsSection;
@@ -9,6 +9,7 @@ const tabs: { key: SettingsSection; label: string }[] = [
   { key: "cycles", label: "Ciclos acadêmicos" },
   { key: "catalog", label: "Unidades e cursos" },
   { key: "import", label: "Importar projetos" },
+  { key: "emails", label: "E-mails" },
 ];
 
 export function SettingsTabs({ section, onChange }: SettingsTabsProps) {

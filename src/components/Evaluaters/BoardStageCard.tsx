@@ -16,7 +16,6 @@ interface Board {
   second: string;
   secondAwaiting: boolean;
   secondName: string;
-  status: string;
 }
 
 export function BoardStageCard({
@@ -24,7 +23,6 @@ export function BoardStageCard({
   board,
   editing,
   canEdit,
-  canDefine,
   archived,
   locked,
   evaluatorOptions,
@@ -38,7 +36,6 @@ export function BoardStageCard({
   board: Board;
   editing: boolean;
   canEdit: boolean;
-  canDefine: boolean;
   archived: boolean;
   locked: boolean;
   evaluatorOptions: string[];
@@ -65,8 +62,8 @@ export function BoardStageCard({
           </h2>
 
           <p className="mt-2 max-w-sm text-sm leading-relaxed text-slate-500">
-            As sugestões e a definição da banca final serão habilitadas quando o
-            projeto alcançar o décimo primeiro mês do ciclo.
+            A definição da banca final serão habilitadas quando o projeto
+            alcançar o décimo primeiro mês do ciclo.
           </p>
         </div>
       </Card>
@@ -78,55 +75,22 @@ export function BoardStageCard({
       {/* Cabeçalho */}
       <div className="flex flex-col gap-4 border-b border-slate-100 px-5 py-5 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
-          <Badge
-            tone={
-              board.status === "Definida"
-                ? "success"
-                : board.status === "Sugerida"
-                  ? "warning"
-                  : "danger"
-            }
-          >
-            {board.status}
-          </Badge>
-
-          <h2 className="mt-3 text-lg font-semibold text-slate-800">{title}</h2>
+          <h2 className="text-lg font-semibold text-slate-800">{title}</h2>
 
           <p className="mt-1 text-sm leading-relaxed text-slate-500">
             {archived
               ? "Composição registrada no ciclo encerrado."
-              : canDefine
-                ? board.status === "Definida"
-                  ? "Banca aprovada. Os dados ainda podem ser alterados."
-                  : board.status === "Sugerida"
-                    ? "Sugestão do orientador pronta para revisão ou aprovação."
-                    : "Aguardando sugestão do orientador."
-                : board.status === "Sugerida"
-                  ? "Sugestão enviada ao comitê local."
-                  : "Nenhuma sugestão de banca enviada até o momento."}
+              : board.first || board.second
+                ? "Composição da banca definida. Os dados podem ser alterados."
+                : "Nenhum avaliador definido até o momento."}
           </p>
         </div>
 
         {canEdit && !editing && (
           <div className="flex flex-wrap gap-2">
             <Button variant="secondary" icon="users" onClick={onEdit}>
-              {canDefine ? "Revisar dados" : "Editar sugestão"}
+              Editar banca
             </Button>
-
-            {canDefine && board.status === "Sugerida" && (
-              <Button
-                icon="check"
-                // disabled={
-                //   !board.date ||
-                //   !board.time ||
-                //   !board.first.trim() ||
-                //   !board.second.trim()
-                // }
-                onClick={onSave}
-              >
-                {canDefine ? "Salvar alterações" : "Enviar sugestão"}
-              </Button>
-            )}
           </div>
         )}
       </div>
@@ -137,7 +101,7 @@ export function BoardStageCard({
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <label className="flex flex-col gap-2">
               <span className="text-sm font-medium text-slate-700">
-                Data sugerida
+                Data da defesa
               </span>
               <input
                 type="date"
@@ -239,7 +203,7 @@ export function BoardStageCard({
               // }
               onClick={onSave}
             >
-              {canDefine ? "Salvar alterações" : "Enviar sugestão"}
+              Definir banca
             </Button>
           </div>
         </div>
@@ -266,13 +230,7 @@ export function BoardStageCard({
 
               <div className="space-y-3">
                 {board.first && (
-                  <EvaluatorPerson
-                    index="01"
-                    name={board.first}
-                    status={
-                      board.status === "Definida" ? "Definido" : "Sugerido"
-                    }
-                  />
+                  <EvaluatorPerson index="01" name={board.first} />
                 )}
 
                 {board.second && (
@@ -280,11 +238,7 @@ export function BoardStageCard({
                     index="02"
                     name={board.second}
                     status={
-                      board.secondAwaiting
-                        ? "Aguardando cadastro"
-                        : board.status === "Definida"
-                          ? "Definido"
-                          : "Sugerido"
+                      board.secondAwaiting ? "Aguardando cadastro" : undefined
                     }
                   />
                 )}
@@ -297,7 +251,7 @@ export function BoardStageCard({
                 Nenhum avaliador definido
               </p>
               <p className="mt-1 text-xs text-slate-400">
-                A composição aparecerá aqui após o envio da sugestão.
+                A composição aparecerá aqui após a definição da banca.
               </p>
             </div>
           )}

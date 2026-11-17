@@ -20,7 +20,6 @@ import { ChangePasswordPage } from "../pages/ChangePassword/ChangePassword";
 import { AppLayout } from "../components/Layout/AppLayout";
 import { UsersPage } from "../pages/Users/Users";
 import { UserAddPage } from "../pages/Users/RegisterUsers";
-// import { UserEditPage } from "../pages/Users/EditUsers";
 import { PendingUsersPage } from "../pages/Users/PedingUsers";
 import { SettingsPage } from "../pages/Settings/Settings";
 import { MyUserRequestsPage } from "../pages/Users/MyUserRequest";
@@ -30,6 +29,9 @@ import { ProjectEvaluationDetail } from "../pages/Evalutions/EvaluationDetail";
 import { ReportsPage } from "../pages/Reports/Reports";
 import { ProjectReportsDetail } from "../pages/Reports/ReportsDetail";
 import { SpreadsheetsPage } from "../pages/Spreadsheets/Spreadsheets";
+import { PrivacyNoticeModal } from "../components/PrivacyNoticeModal";
+import { UserDetailsPage } from "../pages/Users/UserDetails";
+import { BoardsPage } from "../pages/Evaluaters/Boards";
 
 function ScreenLoading() {
   return (
@@ -48,6 +50,7 @@ function ProtectedRoute() {
 
   const isStudent = user.roles.includes("STUDENT");
   const needsProfileCompletion = isStudent && !user.profileCompleted;
+  const needsPrivacyAcceptance = user.privacyAccepted === false;
 
   function handleCancelProfile() {
     clearSession();
@@ -63,7 +66,9 @@ function ProtectedRoute() {
     <>
       <Outlet />
 
-      {needsProfileCompletion && (
+      {needsPrivacyAcceptance && <PrivacyNoticeModal />}
+
+      {needsProfileCompletion && !needsPrivacyAcceptance && (
         <CompleteStudentProfile
           onCompleted={async () => {
             await refreshUser();
@@ -135,6 +140,7 @@ export function AppRoutes() {
 
           <Route path="/projects" element={<ProjectsPage />} />
           <Route path="/projects/:projectId" element={<ProjectDetail />} />
+          <Route path="/evaluators" element={<BoardsPage />} />
           <Route
             path="/projects/:projectId/evaluators"
             element={<EvaluatorsPage />}
@@ -163,6 +169,7 @@ export function AppRoutes() {
             <Route path="/users" element={<UsersPage />} />
             <Route path="/user-add" element={<UserAddPage />} />
             <Route path="/user-edit/:id" element={<UserEditPage />} />
+            <Route path="/users/:id" element={<UserDetailsPage />} />
             <Route path="/pending-users" element={<PendingUsersPage />} />
             <Route path="/settings" element={<SettingsPage />} />
           </Route>

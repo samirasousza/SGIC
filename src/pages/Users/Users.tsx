@@ -186,6 +186,7 @@ export function UsersPage() {
                 <div className="mt-5">
                   <UserTable
                     users={users}
+                    onView={(user) => navigate(`/users/${user.id}`)}
                     onEdit={(user) => navigate(`/user-edit/${user.id}`)}
                   />
                 </div>

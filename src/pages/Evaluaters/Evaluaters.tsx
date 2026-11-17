@@ -15,7 +15,7 @@ import { getTeachers } from "../../services/userService";
 import {
   GetProjectBoard,
   RegisterProjectBoard,
-} from "../../services/BoardService";
+} from "../../services/boardService";
 
 import type { ProjectDetailsModel } from "../../models/projectModel";
 import type { TeacherModel } from "../../models/userModel";
@@ -38,7 +38,6 @@ interface BoardForm {
   second: string;
   secondAwaiting: boolean;
   secondName: string;
-  status: string;
 }
 
 type BoardsState = Record<Stage, BoardForm>;
@@ -51,7 +50,6 @@ const initialBoard: BoardForm = {
   second: "",
   secondAwaiting: false,
   secondName: "",
-  status: "Pendente",
 };
 
 function getDefenseType(stage: Stage): DefenseType {
@@ -82,7 +80,6 @@ function toBoardForm(defense?: DefenseBoardModel): BoardForm {
     second: external ? memberLabel(external) : "",
     secondAwaiting: !!external?.awaitingRegistration,
     secondName: external?.suggestedName ?? "",
-    status: defense.members.length ? "Sugerida" : "Pendente",
   };
 }
 
@@ -130,10 +127,17 @@ export function EvaluatorsPage() {
 
     let cancelled = false;
 
+    // A lista de docentes só serve para indicar a banca e o back só a libera ao
+    // orientador/admin. Aluno e demais perfis só consultam a banca (leitura).
+    const canListTeachers =
+      selectedRole === "ADVISOR" || selectedRole === "ADMIN";
+
     Promise.all([
       GetProjectDetails(projectId),
       GetProjectBoard(projectId),
-      getTeachers(),
+      canListTeachers
+        ? getTeachers().catch(() => [] as TeacherModel[])
+        : Promise.resolve([] as TeacherModel[]),
     ])
       .then(([projectData, boardData, teacherData]) => {
         if (cancelled) return;
@@ -158,15 +162,16 @@ export function EvaluatorsPage() {
     return () => {
       cancelled = true;
     };
-  }, [projectId]);
+  }, [projectId, selectedRole]);
 
-  const isCommittee =
-    selectedRole === "LOCAL_COMMITTEE" || selectedRole === "TECHNICAL_SUPPORT";
+  // Orientador, comitê local e apoio técnico podem definir a banca livremente.
+  const isAdvisor = selectedRole === "ADVISOR";
+  const canEdit =
+    isAdvisor ||
+    selectedRole === "LOCAL_COMMITTEE" ||
+    selectedRole === "TECHNICAL_SUPPORT";
 
-  const canSuggest = selectedRole === "ADVISOR";
-  const canDefine = isCommittee;
-
-  // Só avaliadores cadastrados entram nas opções (sugestões sem cadastro não).
+  // Só avaliadores cadastrados entram nas opções (pessoas sem cadastro não).
   const evaluatorOptions = [
     ...new Set([
       ...teachers.map(getEvaluatorLabel),
@@ -319,16 +324,10 @@ export function EvaluatorsPage() {
       />
 
       <PageHeader
-        title={
-          isCommittee
-            ? "Definição de banca"
-            : canSuggest
-              ? "Sugestão de banca"
-              : "Bancas do projeto"
-        }
+        title={canEdit ? "Definição de banca" : "Bancas do projeto"}
       />
 
-      {canSuggest && (
+      {isAdvisor && (
         <div className="mb-5 flex flex-wrap justify-end gap-2">
           <Button
             variant="secondary"
@@ -384,20 +383,6 @@ export function EvaluatorsPage() {
         </div>
       )}
 
-      {isCommittee && (
-        <div className="mb-5 flex gap-3 rounded-xl border border-blue-200 bg-blue-50 p-4">
-          <Icon name="info" size={20} />
-          <div>
-            <strong className="text-sm font-semibold text-blue-800">
-              Sugestões do orientador disponíveis
-            </strong>
-            <p className="mt-1 text-sm text-blue-700">
-              Revise a composição da banca e salve os avaliadores selecionados.
-            </p>
-          </div>
-        </div>
-      )}
-
       <div className="grid grid-cols-1 gap-5 xl:grid-cols-2">
         {(["partial", "final"] as const).map((stage) => (
           <BoardStageCard
@@ -405,8 +390,7 @@ export function EvaluatorsPage() {
             stage={stage}
             board={boards[stage]}
             editing={editingStage === stage}
-            canEdit={(canSuggest || canDefine) && !archived}
-            canDefine={canDefine}
+            canEdit={canEdit && !archived}
             archived={archived}
             locked={locked}
             evaluatorOptions={evaluatorOptions}

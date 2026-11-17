@@ -7,9 +7,10 @@ import { UserStatusBadge } from "./UserStatusBadge";
 interface UserTableProps {
   users: UserModel[];
   onEdit: (user: UserModel) => void;
+  onView: (user: UserModel) => void;
 }
 
-export function UserTable({ users, onEdit }: UserTableProps) {
+export function UserTable({ users, onEdit, onView }: UserTableProps) {
   if (!users.length) {
     return (
       <div className="py-12 text-center">
@@ -37,7 +38,17 @@ export function UserTable({ users, onEdit }: UserTableProps) {
           {users.map((user) => (
             <tr
               key={user.id}
-              className="border-b border-slate-100 transition-colors last:border-0 hover:bg-slate-50/70"
+              tabIndex={0}
+              onClick={() => onView(user)}
+              onKeyDown={(event) => {
+                if (
+                  event.target === event.currentTarget &&
+                  event.key === "Enter"
+                ) {
+                  onView(user);
+                }
+              }}
+              className="cursor-pointer border-b border-slate-100 transition-colors last:border-0 hover:bg-slate-50/70 focus-visible:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#143c54]/30"
             >
               <td className="px-4 py-4">
                 <div className="flex items-center gap-3">
@@ -71,7 +82,14 @@ export function UserTable({ users, onEdit }: UserTableProps) {
                 <UserStatusBadge active={user.active} />
               </td>
               <td className="px-4 py-4 text-right">
-                <Button variant="table" onClick={() => onEdit(user)}>
+                <Button
+                  variant="table"
+                  onClick={(event) => {
+                    // Evita abrir a tela de detalhes ao clicar em "Editar".
+                    event.stopPropagation();
+                    onEdit(user);
+                  }}
+                >
                   Editar
                 </Button>
               </td>

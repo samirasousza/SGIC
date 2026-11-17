@@ -8,28 +8,8 @@ export function EvaluatorPerson({
 }: {
   index: string;
   name: string;
-  status: string;
+  status?: string;
 }) {
-  const statusConfig = {
-    Pendente: {
-      tone: "danger",
-      icon: "clock",
-    },
-    Sugerido: {
-      tone: "warning",
-      icon: "clock",
-    },
-    Definido: {
-      tone: "success",
-      icon: "check",
-    },
-  } as const;
-
-  const config = statusConfig[status as keyof typeof statusConfig] ?? {
-    tone: "neutral",
-    icon: "info",
-  };
-
   return (
     <div className="flex items-center gap-3 rounded-lg border border-slate-100 bg-slate-50/70 p-3">
       <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white text-xs font-semibold text-slate-500 ring-1 ring-slate-200">
@@ -45,10 +25,12 @@ export function EvaluatorPerson({
         </small>
       </div>
 
-      <Badge tone={config.tone}>
-        <Icon name={config.icon} size={12} />
-        {status}
-      </Badge>
+      {status && (
+        <Badge tone="warning">
+          <Icon name="clock" size={12} />
+          {status}
+        </Badge>
+      )}
     </div>
   );
 }
