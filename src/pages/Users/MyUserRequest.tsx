@@ -19,7 +19,7 @@ const statusLabel = {
 const statusStyle = {
   PENDING: "bg-amber-50 text-amber-700",
   APPROVED: "bg-emerald-50 text-emerald-700",
-  REJECTED: "bg-red-50 text-red-700",
+  REJECTED: "bg-rose-50 text-rose-700",
 } as const;
 
 export function MyUserRequestsPage() {
@@ -92,7 +92,7 @@ export function MyUserRequestsPage() {
       />
 
       {error && (
-        <p className="rounded-lg bg-red-50 p-3 text-sm text-red-700">{error}</p>
+        <p className="rounded-lg border border-rose-100 bg-rose-50 p-3 text-sm text-rose-700">{error}</p>
       )}
 
       <Card>
@@ -107,9 +107,9 @@ export function MyUserRequestsPage() {
         ) : (
           <ul className="divide-y divide-slate-100">
             {requests.map((r) => (
-              <li key={r.id} className="space-y-1 py-4">
+              <li key={r.id} className="space-y-2 py-5 first:pt-0 last:pb-0">
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <p className="font-medium text-slate-800">{r.name}</p>
+                  <p className="font-semibold text-slate-800">{r.name}</p>
                   <span
                     className={`rounded-full px-3 py-1 text-xs font-semibold ${statusStyle[r.status]}`}
                   >

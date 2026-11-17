@@ -36,7 +36,7 @@ export function Button({
 
     // .btn-ghost: padding lateral reduzido, sem fundo, cor azul
     ghost:
-      "bg-transparent text-[#143c54] px-1.5 border-transparent hover:bg-[#eaf1f5] active:bg-[#dce8ef]",
+      "bg-transparent text-[#143c54] px-1.5 border-transparent text-blue-700 hover:text-blue-900",
 
     // .btn-danger: cor vermelha com fundo suave avermelhado
     danger:
@@ -44,7 +44,7 @@ export function Button({
 
     // .btn-table: variante compacta usada dentro de tabelas (6px 10px, texto 10px)
     table:
-      "min-h-0 h-auto py-1.5 px-2.5 gap-1.5 rounded-[5px] text-[10px] bg-[#eaf1f5] text-[#143c54] border-transparent whitespace-nowrap hover:bg-[#dce8ef]",
+      "min-h-0 h-auto gap-1.5 text-[10px] rounded-lg px-2.5 py-1.5 text-blue-700 hover:bg-blue-50 border-transparent whitespace-nowrap",
   };
 
   return (

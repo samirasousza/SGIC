@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   PendingUserCard,
@@ -10,13 +10,14 @@ import {
   getAllUserRequests,
   rejectUserRequest,
 } from "../../services/userRequestssService";
+import { Button } from "../../components/Button";
 
 type View = "PENDING" | "HISTORY";
 
 const statusStyle = {
   PENDING: "bg-amber-50 text-amber-700",
   APPROVED: "bg-emerald-50 text-emerald-700",
-  REJECTED: "bg-red-50 text-red-700",
+  REJECTED: "bg-rose-50 text-rose-700",
 } as const;
 
 const statusLabel = {
@@ -56,25 +57,7 @@ export function PendingUsersPage({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
-
-  const load = useCallback(async () => {
-    try {
-      const data = await getAllUserRequests(
-        view === "PENDING" ? ["PENDING"] : ["APPROVED", "REJECTED"],
-      );
-
-      setRequests(data);
-      setError("");
-
-      if (view === "PENDING") {
-        onCountChange?.(data.length);
-      }
-    } catch {
-      setError("Não foi possível carregar as solicitações.");
-    } finally {
-      setLoading(false);
-    }
-  }, [view, onCountChange]);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
@@ -106,7 +89,7 @@ export function PendingUsersPage({
     return () => {
       cancelled = true;
     };
-  }, [view, onCountChange]);
+  }, [view, onCountChange, refreshKey]);
 
   function handleRegister(p: PendingUser) {
     const request = requests.find((r) => r.id === p.id);
@@ -125,7 +108,7 @@ export function PendingUsersPage({
       setMessage(`Solicitação de ${request?.name ?? "usuário"} recusada.`);
 
       setLoading(true);
-      await load();
+      setRefreshKey((current) => current + 1);
     } catch {
       setError("Não foi possível recusar a solicitação.");
     }
@@ -134,51 +117,48 @@ export function PendingUsersPage({
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="text-2xl font-bold text-gray-900">
+        <h1 className="text-2xl font-bold text-slate-900">
           Cadastros de avaliadores externos
         </h1>
-        <p className="mt-1 text-sm text-gray-500">
+        <p className="mt-1 text-sm text-slate-500">
           Analise as solicitações ou consulte o histórico.
         </p>
       </header>
 
       <div className="flex gap-2">
         {(["PENDING", "HISTORY"] as const).map((v) => (
-          <button
+          <Button
             key={v}
-            type="button"
+            variant={view === v ? "primary" : "secondary"}
             onClick={() => {
               setLoading(true);
               setMessage("");
               setView(v);
             }}
-            className={`rounded-lg px-4 py-2 text-sm font-medium ${
-              view === v ? "bg-blue-700 text-white" : "border text-gray-600"
-            }`}
           >
             {v === "PENDING" ? "Pendentes" : "Histórico"}
-          </button>
+          </Button>
         ))}
       </div>
 
       {message && (
-        <div className="rounded-lg bg-blue-50 p-4 text-sm text-blue-800">
+        <div className="rounded-lg border border-[#dce5eb] bg-[#f2f6f8] p-4 text-sm text-[#143c54]">
           {message}
         </div>
       )}
       {error && (
-        <div className="rounded-lg bg-red-50 p-4 text-sm text-red-700">
+        <div className="rounded-lg border border-rose-100 bg-rose-50 p-4 text-sm text-rose-700">
           {error}
         </div>
       )}
 
-      <section className="rounded-xl border bg-white p-5">
+      <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
         {loading ? (
-          <p className="py-10 text-center text-sm text-gray-500">
+          <p className="py-10 text-center text-sm text-slate-500">
             Carregando...
           </p>
         ) : !requests.length ? (
-          <p className="py-10 text-center text-sm text-gray-500">
+          <p className="py-10 text-center text-sm text-slate-500">
             {view === "PENDING"
               ? "Nenhuma solicitação pendente."
               : "Nenhuma solicitação analisada."}
@@ -195,23 +175,23 @@ export function PendingUsersPage({
             ))}
           </div>
         ) : (
-          <ul className="divide-y">
+          <ul className="divide-y divide-slate-100">
             {requests.map((r) => (
               <li
                 key={r.id}
                 className="flex flex-wrap items-center justify-between gap-3 py-4"
               >
                 <div>
-                  <p className="font-medium text-gray-900">{r.name}</p>
-                  <p className="text-xs text-gray-500">
+                  <p className="font-medium text-slate-900">{r.name}</p>
+                  <p className="text-xs text-slate-500">
                     {r.email} · solicitado por {r.requestedBy.name}
                     {r.project ? ` · ${r.project.title}` : ""}
                   </p>
-                  <p className="mt-1 text-xs text-gray-500">
+                  <p className="mt-1 text-xs text-slate-500">
                     Motivo: {r.reason}
                   </p>
                   {r.reviewedBy && (
-                    <p className="text-xs text-gray-400">
+                    <p className="text-xs text-slate-400">
                       Analisado por {r.reviewedBy.name}
                       {r.reviewedAt
                         ? ` em ${new Date(r.reviewedAt).toLocaleDateString("pt-BR")}`

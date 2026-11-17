@@ -2,6 +2,7 @@ import { translateRole } from "../../utils/translateRole";
 import { formatCpf } from "../../utils/formatCpf";
 import { formatPhone } from "../../utils/formatPhone";
 import { Icon } from "../Icon";
+import { Button } from "../Button";
 import { formatRequestDate } from "../../utils/formatRequestDate";
 import type { UserRole } from "../../types/userRoleType";
 
@@ -38,8 +39,8 @@ function InfoItem({
 }) {
   return (
     <div className={className}>
-      <p className="text-xs font-medium text-gray-500">{label}</p>
-      <p className="mt-1 break-words text-sm font-medium text-gray-800">
+      <p className="text-xs font-medium text-slate-500">{label}</p>
+      <p className="mt-1 break-words text-sm font-medium text-slate-800">
         {value || "Não informado"}
       </p>
     </div>
@@ -55,17 +56,17 @@ export function PendingUserCard({
   const phone = formatPhone(request.phone);
 
   return (
-    <article className="rounded-xl border border-gray-200 bg-white p-5 transition hover:border-gray-300">
+    <article className="rounded-xl border border-slate-200 bg-white p-5 transition hover:border-slate-300">
       {/* Cabeçalho */}
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="flex min-w-0 items-center gap-3">
-          <div className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
+          <div className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-[#eaf1f5] text-sm font-semibold text-[#143c54]">
             {<Icon name="user" size={19} />}
           </div>
 
           <div className="min-w-0">
-            <h3 className="font-semibold text-gray-900">{request.name}</h3>
-            <p className="break-all text-sm text-gray-500">{request.email}</p>
+            <h3 className="font-semibold text-slate-900">{request.name}</h3>
+            <p className="break-all text-sm text-slate-500">{request.email}</p>
           </div>
         </div>
 
@@ -76,7 +77,7 @@ export function PendingUserCard({
 
       {/* Dados do avaliador */}
       <section className="mt-6">
-        <h4 className="mb-4 text-sm font-semibold text-gray-900">
+        <h4 className="mb-4 text-sm font-semibold text-slate-900">
           Dados do avaliador
         </h4>
 
@@ -92,8 +93,8 @@ export function PendingUserCard({
       </section>
 
       {/* Dados da solicitação */}
-      <section className="mt-6 border-t border-gray-100 pt-5">
-        <h4 className="mb-4 text-sm font-semibold text-gray-900">
+      <section className="mt-6 border-t border-slate-100 pt-5">
+        <h4 className="mb-4 text-sm font-semibold text-slate-900">
           Dados da solicitação
         </h4>
 
@@ -121,22 +122,11 @@ export function PendingUserCard({
       </section>
 
       {/* Ações */}
-      <div className="mt-6 flex flex-wrap justify-end gap-3 border-t border-gray-100 pt-4">
-        <button
-          type="button"
-          onClick={() => onReject(request.id)}
-          className="cursor-pointer rounded-lg border border-red-200 px-4 py-2 text-sm font-medium text-red-700 transition hover:bg-red-50"
-        >
+      <div className="mt-6 flex flex-wrap justify-end gap-3 border-t border-slate-100 pt-4">
+        <Button variant="danger" onClick={() => onReject(request.id)}>
           Recusar solicitação
-        </button>
-
-        <button
-          type="button"
-          onClick={() => onRegister(request)}
-          className="cursor-pointer rounded-lg bg-blue-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-800"
-        >
-          Cadastrar usuário
-        </button>
+        </Button>
+        <Button onClick={() => onRegister(request)}>Cadastrar usuário</Button>
       </div>
     </article>
   );

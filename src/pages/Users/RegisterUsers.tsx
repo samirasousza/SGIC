@@ -15,6 +15,7 @@ import { academicTitleOptions } from "../../utils/translateAcademicTitle";
 import { getApiError } from "../../utils/apiErrorResponse";
 import { FeedbackCard, type FeedbackData } from "../../components/FeedbackCard";
 import { Breadcrumbs } from "../../components/Breadcrumbs";
+import { Button } from "../../components/Button";
 
 interface FormState {
   name: string;
@@ -63,8 +64,6 @@ export function UserAddPage() {
       return updated;
     });
   }
-
-  const isAdmin = form.roles.includes("ADMIN");
 
   const showAcademicInfo = form.roles.some(
     (role) => !["STUDENT", "ADMIN", "TECHNICAL_SUPPORT"].includes(role),
@@ -155,10 +154,10 @@ export function UserAddPage() {
   }
 
   const inputClass = (field: string) =>
-    `w-full rounded-lg border px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-100 ${
+    `w-full rounded-lg border bg-white px-3 py-2.5 text-sm text-slate-700 outline-none transition focus:ring-2 focus:ring-[#143c54]/10 ${
       fieldErrors[field]
-        ? "border-red-500 focus:border-red-500"
-        : "border-gray-300 focus:border-blue-500"
+        ? "border-rose-500 focus:border-rose-500"
+        : "border-slate-200 focus:border-[#143c54]"
     }`;
 
   return (
@@ -172,13 +171,13 @@ export function UserAddPage() {
           ]}
         />
 
-        <h1 className="mt-1 text-2xl font-bold text-gray-900">
+        <h1 className="mt-1 text-2xl font-bold text-slate-900">
           Adicionar usuário
         </h1>
       </header>
 
-      <section className="rounded-xl border bg-white p-6">
-        <h2 className="font-semibold text-gray-900">Dados cadastrais</h2>
+      <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+        <h2 className="font-semibold text-slate-900">Dados cadastrais</h2>
 
         <div className="mt-5 grid gap-4 md:grid-cols-2">
           <label className="md:col-span-2">
@@ -193,7 +192,7 @@ export function UserAddPage() {
               placeholder="Nome completo"
             />
             {fieldErrors.name && (
-              <p className="mt-1 text-xs text-red-600">{fieldErrors.name}</p>
+              <p className="mt-1 text-xs text-rose-600">{fieldErrors.name}</p>
             )}
           </label>
 
@@ -208,7 +207,7 @@ export function UserAddPage() {
               placeholder="usuario@uea.edu.br"
             />
             {fieldErrors.email && (
-              <p className="mt-1 text-xs text-red-600">{fieldErrors.email}</p>
+              <p className="mt-1 text-xs text-rose-600">{fieldErrors.email}</p>
             )}
           </label>
 
@@ -223,7 +222,7 @@ export function UserAddPage() {
               placeholder="000.000.000-00"
             />
             {fieldErrors.cpf && (
-              <p className="mt-1 text-xs text-red-600">{fieldErrors.cpf}</p>
+              <p className="mt-1 text-xs text-rose-600">{fieldErrors.cpf}</p>
             )}
           </label>
 
@@ -237,14 +236,15 @@ export function UserAddPage() {
               placeholder="(92) 99999-9999"
             />
             {fieldErrors.phone && (
-              <p className="mt-1 text-xs text-red-600">{fieldErrors.phone}</p>
+              <p className="mt-1 text-xs text-rose-600">{fieldErrors.phone}</p>
             )}
           </label>
 
           <label>
-            <span className="mb-1.5 block text-sm font-medium">Curso *</span>
+            <span className="mb-1.5 block text-sm font-medium text-slate-700">
+              Curso *
+            </span>
             <select
-              required={!isAdmin}
               value={form.courseId}
               onChange={(e) => update("courseId", e.target.value)}
               disabled={loadingCourses}
@@ -258,12 +258,12 @@ export function UserAddPage() {
 
               {courses.map((course) => (
                 <option key={course.id} value={course.id}>
-                  {course.name} — {course.unit.acronym}
+                  {course.name}
                 </option>
               ))}
             </select>
             {fieldErrors.courseId && (
-              <p className="mt-1 text-xs text-red-600">
+              <p className="mt-1 text-xs text-rose-600">
                 {fieldErrors.courseId}
               </p>
             )}
@@ -291,7 +291,7 @@ export function UserAddPage() {
                   ))}
                 </select>
                 {fieldErrors.academicTitle && (
-                  <p className="mt-1 text-xs text-red-600">
+                  <p className="mt-1 text-xs text-rose-600">
                     {fieldErrors.academicTitle}
                   </p>
                 )}
@@ -309,7 +309,7 @@ export function UserAddPage() {
                   placeholder="Nome da instituição"
                 />
                 {fieldErrors.institution && (
-                  <p className="mt-1 text-xs text-red-600">
+                  <p className="mt-1 text-xs text-rose-600">
                     {fieldErrors.institution}
                   </p>
                 )}
@@ -319,10 +319,10 @@ export function UserAddPage() {
         </div>
       </section>
 
-      <section className="rounded-xl border bg-white p-6">
-        <h2 className="font-semibold text-gray-900">Perfis e permissões</h2>
+      <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+        <h2 className="font-semibold text-slate-900">Perfis e permissões</h2>
 
-        <p className="mt-1 text-sm text-gray-500">
+        <p className="mt-1 text-sm text-slate-500">
           Selecione os perfis que o usuário terá no sistema.
         </p>
 
@@ -334,7 +334,7 @@ export function UserAddPage() {
         </div>
 
         {fieldErrors.roles && (
-          <p className="mt-2 text-xs text-red-600">{fieldErrors.roles}</p>
+          <p className="mt-2 text-xs text-rose-600">{fieldErrors.roles}</p>
         )}
       </section>
 
@@ -347,23 +347,22 @@ export function UserAddPage() {
       )}
 
       <div className="flex justify-end gap-3">
-        <button
+        <Button
           type="button"
+          variant="secondary"
           onClick={() => navigate("/users")}
-          className="cursor-pointer rounded-lg border px-5 py-2.5 text-sm"
+          disabled={loading}
         >
           Cancelar
-        </button>
-
-        <button
+        </Button>
+        <Button
           type="submit"
           disabled={
             loading || loadingCourses || registered || !form.roles.length
           }
-          className="cursor-pointer rounded-lg bg-blue-700 px-5 py-2.5 text-sm font-medium text-white disabled:opacity-50"
         >
           {loading ? "Cadastrando..." : "Cadastrar usuário"}
-        </button>
+        </Button>
       </div>
     </form>
   );

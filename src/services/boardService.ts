@@ -24,13 +24,13 @@ export const RegisterProjectBoard = async (
     )
   ).data;
 
-export const RemoveProjectBoardMember = async (
-  projectId: string,
-  memberId: string,
-  justification: string,
-): Promise<void> => {
-  await api.post(
-    `${API_URL_PROJECTS}/${projectId}/board/members/${memberId}/remove`,
-    { justification },
-  );
-};
+// export const RemoveProjectBoardMember = async (
+//   projectId: string,
+//   memberId: string,
+//   justification: string,
+// ): Promise<void> => {
+//   await api.post(
+//     `${API_URL_PROJECTS}/${projectId}/board/members/${memberId}/remove`,
+//     { justification },
+//   );
+// };
