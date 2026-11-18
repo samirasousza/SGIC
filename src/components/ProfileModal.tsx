@@ -16,11 +16,8 @@ export function ProfileModal({ close }: ProfileModalProps) {
 
   const navigate = useNavigate();
 
-  const { showStudentFields, showTeacherFields, showCourse } =
+  const { showTeacherFields, showCourse } =
     getUserFieldVisibility(user?.roles);
-
-  const yesNo = (value: boolean | null | undefined) =>
-    value == null ? "—" : value ? "Sim" : "Não";
 
   const data = [
     { label: "Nome completo", value: user?.name || "—" },
@@ -48,12 +45,6 @@ export function ProfileModal({ close }: ProfileModalProps) {
               : "—",
           },
           { label: "Instituição", value: user?.institution || "—" },
-        ]
-      : []),
-    ...(showStudentFields
-      ? [
-          { label: "Pessoa com deficiência", value: yesNo(user?.pcd) },
-          { label: "Possui graduação", value: yesNo(user?.hasDegree) },
         ]
       : []),
   ];
