@@ -199,9 +199,47 @@ export function ReportUploadModal({
               type="file"
               accept="application/pdf,.pdf"
               className="sr-only"
-              onChange={(event) => {
-                setFile(event.target.files?.[0] ?? null);
+              onChange={async (event) => {
+                const selectedFile = event.target.files?.[0] ?? null;
+
+                if (!selectedFile) return;
+
+                setFile(selectedFile);
                 setError("");
+
+                if (
+                  selectedFile.type !== "application/pdf" &&
+                  !selectedFile.name.toLowerCase().endsWith(".pdf")
+                ) {
+                  setError("O arquivo precisa estar no formato PDF.");
+                  setFile(null);
+                  return;
+                }
+
+                if (selectedFile.size > 10 * 1024 * 1024) {
+                  setError("O arquivo deve ter no máximo 10 MB.");
+                  setFile(null);
+                  return;
+                }
+
+                setSaving(true);
+
+                try {
+                  const updated = await PutReportDraft(
+                    currentReport.id,
+                    selectedFile,
+                  );
+                  setCurrentReport(updated);
+                  onUpdated(updated);
+                  setFile(null);
+                } catch {
+                  setError(
+                    "Não foi possível anexar o arquivo. Verifique se o PDF é válido e tente novamente.",
+                  );
+                } finally {
+                  setSaving(false);
+                  event.target.value = "";
+                }
               }}
             />
             {file && (
@@ -216,12 +254,6 @@ export function ReportUploadModal({
               O arquivo está anexado como rascunho. Clique em enviar para criar
               uma nova versão e encaminhá-la ao orientador.
             </p>
-          )}
-
-          {file && (
-            <Button onClick={uploadDraft} disabled={saving}>
-              {currentReport.draft ? "Substituir rascunho" : "Anexar arquivo"}
-            </Button>
           )}
         </div>
 
