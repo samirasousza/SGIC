@@ -261,11 +261,16 @@ export function ReportUploadModal({
           <Button variant="secondary" onClick={close}>
             Fechar
           </Button>
+
+          <Button variant="secondary" onClick={close} disabled={saving}>
+            Salvar rascunho
+          </Button>
+
           <Button
             onClick={submitReport}
-            disabled={!currentReport.draft || !!file || saving}
+            disabled={!currentReport.draft || saving}
           >
-            Enviar relatório
+            {saving ? "Salvando..." : "Enviar relatório"}
           </Button>
         </footer>
         {confirmRemove && (
