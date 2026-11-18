@@ -27,7 +27,7 @@ import { GetProjectDetails } from "../../services/projectService";
 import type { ProjectDetailsModel } from "../../models/projectModel";
 import type { DefenseBoardModel } from "../../models/projectBoardModel";
 import type { DefenseType } from "../../types/defenseType";
-import { evaluationTitle } from "./EvaluationUtils";
+import { evaluationDescription, evaluationTitle } from "./EvaluationUtils";
 import { useAppContext } from "../../contexts/appContext";
 import { getApiError } from "../../utils/apiErrorResponse";
 import { GetProjectBoard } from "../../services/boardService";
@@ -352,14 +352,18 @@ export function ProjectEvaluationDetail() {
               <h2 className="text-lg font-semibold text-slate-800">
                 {evaluationTitle(role)}
               </h2>
-              <p className="mt-1 text-sm text-slate-500">
-                Preencha os itens da ficha oficial. As alterações podem ser
-                salvas antes da assinatura.
+
+              <p className="mt-2 max-w-3xl text-sm leading-relaxed text-slate-500">
+                {evaluationDescription(role)}
               </p>
+
               {form.score !== null && (
-                <p className="mt-2 text-sm font-medium text-indigo-700">
-                  Nota parcial: {form.score.toFixed(2)} / 100
-                </p>
+                <div className="mt-4 inline-flex items-center gap-2 rounded-lg bg-indigo-50 px-3 py-2">
+                  <Icon name="chart-no-axes-column-increasing" size={16} />
+                  <span className="text-sm font-semibold text-indigo-700">
+                    Nota parcial: {form.score.toFixed(2)} / 100
+                  </span>
+                </div>
               )}
             </div>
 

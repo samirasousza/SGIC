@@ -23,15 +23,19 @@ export function ScoreField({
   const discrete = allowedValues.length > 0;
 
   return (
-    <label className="flex flex-col gap-2">
-      <span className="text-sm font-medium text-slate-700">{label}</span>
+    <div className="flex flex-col gap-2">
+      <span className="text-xs font-semibold text-slate-500 sm:hidden">
+        {label}
+      </span>
 
       {discrete ? (
         <select
           value={value === null ? "" : String(value)}
           disabled={disabled || notApplicable}
           onChange={(event) =>
-            onChange(event.target.value === "" ? null : Number(event.target.value))
+            onChange(
+              event.target.value === "" ? null : Number(event.target.value),
+            )
           }
           className={selectClass}
         >
@@ -51,15 +55,17 @@ export function ScoreField({
           value={value ?? ""}
           disabled={disabled || notApplicable}
           onChange={(event) =>
-            onChange(event.target.value === "" ? null : Number(event.target.value))
+            onChange(
+              event.target.value === "" ? null : Number(event.target.value),
+            )
           }
-          placeholder="Nota de 0 a 10"
+          placeholder="0 a 10"
           className={selectClass}
         />
       )}
 
       {onNotApplicableChange && (
-        <span className="flex items-center gap-2 text-xs font-normal text-slate-500">
+        <label className="flex cursor-pointer items-center gap-2 text-xs font-normal text-slate-500">
           <input
             type="checkbox"
             checked={notApplicable}
@@ -68,8 +74,8 @@ export function ScoreField({
             className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
           />
           Não se aplica (X)
-        </span>
+        </label>
       )}
-    </label>
+    </div>
   );
 }
