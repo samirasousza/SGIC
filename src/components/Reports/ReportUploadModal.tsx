@@ -37,39 +37,6 @@ export function ReportUploadModal({
   const [error, setError] = useState("");
   const [confirmRemove, setConfirmRemove] = useState(false);
 
-  async function uploadDraft() {
-    if (!file) {
-      setError("Selecione um arquivo PDF.");
-      return;
-    }
-    if (
-      file.type !== "application/pdf" &&
-      !file.name.toLowerCase().endsWith(".pdf")
-    ) {
-      setError("O arquivo precisa estar no formato PDF.");
-      return;
-    }
-    if (file.size > 10 * 1024 * 1024) {
-      setError("O arquivo deve ter no máximo 10 MB.");
-      return;
-    }
-
-    setSaving(true);
-    setError("");
-    try {
-      const updated = await PutReportDraft(currentReport.id, file);
-      setCurrentReport(updated);
-      onUpdated(updated);
-      setFile(null);
-    } catch {
-      setError(
-        "Não foi possível anexar o arquivo. Verifique se o PDF é válido e tente novamente.",
-      );
-    } finally {
-      setSaving(false);
-    }
-  }
-
   async function removeDraft() {
     setSaving(true);
     setError("");
@@ -261,16 +228,11 @@ export function ReportUploadModal({
           <Button variant="secondary" onClick={close}>
             Fechar
           </Button>
-
-          <Button variant="secondary" onClick={close} disabled={saving}>
-            Salvar rascunho
-          </Button>
-
           <Button
             onClick={submitReport}
-            disabled={!currentReport.draft || saving}
+            disabled={!currentReport.draft || !!file || saving}
           >
-            {saving ? "Salvando..." : "Enviar relatório"}
+            Enviar relatório
           </Button>
         </footer>
         {confirmRemove && (
