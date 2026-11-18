@@ -135,7 +135,7 @@ export function ProjectDetail() {
           },
           {
             label: "Projetos",
-            onClick: () => navigate("/project"),
+            onClick: () => navigate("/projects"),
           },
           {
             label: project.title,
