@@ -4,7 +4,7 @@ import type {
   UpdateUserRequestModel,
   UserRequestModel,
 } from "../models/UserRequestsModel";
-import type { UserRequestStatusType } from "../types/UserRequestStatusType";
+import type { UserRequestStatusType } from "../types/userRequestStatusType";
 
 const API_URL_USER_REQUESTS = "/user-requests";
 

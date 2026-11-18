@@ -1,5 +1,5 @@
 import type { AcademicTitleType } from "../types/academicTitleType";
-import type { UserRequestStatusType } from "../types/UserRequestStatusType";
+import type { UserRequestStatusType } from "../types/userRequestStatusType";
 import type { UserRole } from "../types/userRoleType";
 import type { CourseModel, ProjectPersonModel } from "./projectModel";
 

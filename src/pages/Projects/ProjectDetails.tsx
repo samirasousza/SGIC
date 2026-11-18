@@ -12,6 +12,7 @@ import { GetProjectDetails } from "../../services/projectService";
 import type { ProjectDetailsModel } from "../../models/projectModel";
 import { scholarshipLabels } from "../../utils/translateScholarship";
 import { academicTitleLabels } from "../../utils/translateAcademicTitle";
+import { useAppContext } from "../../contexts/appContext";
 
 const programLabels: Record<string, string> = {
   PAIC: "PAIC — Programa de Apoio à Iniciação Científica",
@@ -45,6 +46,7 @@ function formatBoolean(value?: boolean | null) {
 
 export function ProjectDetail() {
   const { projectId } = useParams<{ projectId: string }>();
+  const { selectedRole } = useAppContext();
   const navigate = useNavigate();
 
   const [project, setProject] = useState<ProjectDetailsModel | null>(null);
@@ -142,32 +144,32 @@ export function ProjectDetail() {
       />
 
       {/* Cabeçalho */}
-      <PageHeader
-        title={project.title}
-      />
+      <PageHeader title={project.title} />
 
       {/* Atalhos para as funcionalidades do projeto */}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-        <button
-          type="button"
-          onClick={() => navigate(`/projects/${projectId}/reports`)}
-          className="group flex cursor-pointer items-center gap-4 rounded-xl border border-slate-200 bg-white p-4 text-left shadow-sm transition hover:border-indigo-300 hover:shadow-md"
-        >
-          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600">
-            <Icon name="file" size={20} />
-          </span>
+        {selectedRole !== "EVALUATOR" && (
+          <button
+            type="button"
+            onClick={() => navigate(`/projects/${projectId}/reports`)}
+            className="group flex cursor-pointer items-center gap-4 rounded-xl border border-slate-200 bg-white p-4 text-left shadow-sm transition hover:border-indigo-300 hover:shadow-md"
+          >
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600">
+              <Icon name="file" size={20} />
+            </span>
 
-          <span className="min-w-0 flex-1">
-            <strong className="block text-sm font-semibold text-slate-800">
-              Relatórios do projeto
-            </strong>
-            <small className="mt-1 block text-xs text-slate-500">
-              Consultar relatórios e entregas
-            </small>
-          </span>
+            <span className="min-w-0 flex-1">
+              <strong className="block text-sm font-semibold text-slate-800">
+                Relatórios do projeto
+              </strong>
+              <small className="mt-1 block text-xs text-slate-500">
+                Consultar relatórios e entregas
+              </small>
+            </span>
 
-          <Icon name="arrow" size={18} />
-        </button>
+            <Icon name="arrow" size={18} />
+          </button>
+        )}
 
         <button
           type="button"
