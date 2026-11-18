@@ -53,6 +53,27 @@ function getCellLabel(cell: ReportCell): string {
   }
 }
 
+function getReportDisplayStatus(report: ReportModel): ReportCell {
+  if (report.status === "NOT_SENT") {
+    return report.cell;
+  }
+
+  switch (report.status) {
+    case "UNDER_REVIEW":
+    case "RESUBMITTED":
+      return "IN_REVIEW";
+
+    case "CHANGES_REQUESTED":
+      return "CHANGES_REQUESTED";
+
+    case "APPROVED":
+      return "APPROVED";
+
+    default:
+      return report.cell;
+  }
+}
+
 function reportTitle(report: ReportModel) {
   if (report.type === "MONTHLY")
     return `Relatório mensal ${report.referenceMonth}`;
@@ -277,7 +298,8 @@ export function ProjectReportsDetail() {
               {reports.map((report) => {
                 const latestVersion =
                   report.versions[report.versions.length - 1];
-                const tone = getCellTone(report.cell);
+                const displayStatus = getReportDisplayStatus(report);
+                const tone = getCellTone(displayStatus);
                 const canUpload = data.canSubmit && report.acceptsFile;
                 const canOpenReview =
                   (data.canReview &&
@@ -306,7 +328,7 @@ export function ProjectReportsDetail() {
                       {formatDate(latestVersion?.submittedAt ?? null)}
                     </td>
                     <td className="px-4 py-4">
-                      <Badge tone={tone}>{getCellLabel(report.cell)}</Badge>
+                      <Badge tone={tone}>{getCellLabel(displayStatus)}</Badge>
                     </td>
                     <td className="max-w-[240px] px-4 py-4 text-slate-600">
                       {latestVersion?.reviewComment ? (
