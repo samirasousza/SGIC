@@ -82,6 +82,57 @@ function formatNotificationDate(value: string) {
   }).format(date);
 }
 
+function getNotificationPath(notification: NotificationModel): string | null {
+  if (!notification.link) return null;
+
+  const url = new URL(notification.link, window.location.origin);
+
+  const projectMatch = url.pathname.match(/^\/projects\/([^/]+)\/?$/);
+
+  // Se o link já aponta para uma rota específica, preserva o destino.
+  if (!projectMatch) {
+    return `${url.pathname}${url.search}${url.hash}`;
+  }
+
+  const projectId = projectMatch[1];
+
+  const routes: Record<string, string> = {
+    REPORT_DUE_SOON: "reports",
+    REPORT_OVERDUE: "reports",
+    REPORT_REVIEW_PENDING: "reports",
+    REPORT_SUBMITTED: "reports",
+    REPORT_APPROVED: "reports",
+    REPORT_CHANGES_REQUESTED: "reports",
+    REPORT_REOPENED: "reports",
+
+    EVALUATION_PENDING: "evaluations",
+    EVALUATION_REOPENED: "evaluations",
+
+    BOARD_ASSIGNED: "evaluators",
+    BOARD_MEMBER_REMOVED: "evaluators",
+  };
+
+  const destination = routes[notification.type];
+
+  if (destination) {
+    return `/projects/${projectId}/${destination}`;
+  }
+
+  const tab = url.searchParams.get("tab");
+
+  const tabRoutes: Record<string, string> = {
+    reports: "reports",
+    evaluations: "evaluations",
+    evaluators: "evaluators",
+  };
+
+  if (tab && tabRoutes[tab]) {
+    return `/projects/${projectId}/${tabRoutes[tab]}`;
+  }
+
+  return url.pathname;
+}
+
 export function NotificationsPanel({
   close,
   navigate,
@@ -191,19 +242,29 @@ export function NotificationsPanel({
 
   async function handleNotificationClick(notification: NotificationModel) {
     if (busyId) return;
+
     setBusyId(notification.id);
+
     try {
       if (!notification.read) {
         await PostNotificationsReaded(notification.id);
+
         setNotifications((current) =>
           current.map((item) =>
             item.id === notification.id ? { ...item, read: true } : item,
           ),
         );
+
         onNotificationsChanged?.();
       }
+
+      const destination = getNotificationPath(notification);
+
       close();
-      if (notification.link) navigate(notification.link);
+
+      if (destination) {
+        navigate(destination);
+      }
     } catch {
       setError("Não foi possível atualizar esta notificação.");
     } finally {

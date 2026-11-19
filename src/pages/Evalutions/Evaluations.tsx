@@ -18,22 +18,27 @@ type PanelRow = EvaluationPanelModel["rows"][number];
 const PAGE_SIZE = 10;
 
 function statusConfig(state: string | null) {
-  switch (state) {
-    case "SIGNED":
-      return { label: "Preenchida", tone: "success" as const, icon: "check" };
-    case "IN_PROGRESS":
-      return {
-        label: "Em preenchimento",
-        tone: "warning" as const,
-        icon: "clock",
-      };
-    case "PENDING":
-      return { label: "Pendente", tone: "warning" as const, icon: "clock" };
-    case "NOT_RELEASED":
-      return { label: "Não liberada", tone: "neutral" as const, icon: "lock" };
-    default:
-      return { label: "—", tone: "neutral" as const, icon: "minus" };
+  if (state === "SIGNED") {
+    return {
+      label: "Preenchida",
+      tone: "success" as const,
+      icon: "check",
+    };
   }
+
+  if (state === "NOT_RELEASED") {
+    return {
+      label: "Não liberada",
+      tone: "neutral" as const,
+      icon: "lock",
+    };
+  }
+
+  return {
+    label: "Pendente",
+    tone: "warning" as const,
+    icon: "clock",
+  };
 }
 
 function EvaluationStatusBadge({ state }: { state: string | null }) {
@@ -178,7 +183,7 @@ export function EvaluationsPage() {
       <div className="mb-5 flex flex-wrap items-center gap-3">
         <strong className="text-sm text-slate-700">Legenda:</strong>
         <Badge tone="success">Preenchida</Badge>
-        <Badge tone="warning">Pendente / em preenchimento</Badge>
+        <Badge tone="warning">Pendente</Badge>
         <Badge>Não liberada</Badge>
       </div>
 

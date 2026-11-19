@@ -19,13 +19,21 @@ const cellLabels: Record<ReportCell, string> = {
   IN_REVIEW: "Em revisão",
   CHANGES_REQUESTED: "Em ajuste",
   LATE: "Atrasado",
-  NOT_DUE: "Ainda não devido",
+  NOT_DUE: "Prazo não iniciado",
 };
 
 const reportColumns = [
-  ...Array.from({ length: 6 }, (_, index) => ({ label: `M${index + 1}`, type: "MONTHLY" as const, month: index + 1 })),
+  ...Array.from({ length: 6 }, (_, index) => ({
+    label: `M${index + 1}`,
+    type: "MONTHLY" as const,
+    month: index + 1,
+  })),
   { label: "Parcial", type: "PARTIAL" as const, month: null },
-  ...Array.from({ length: 6 }, (_, index) => ({ label: `M${index + 7}`, type: "MONTHLY" as const, month: index + 7 })),
+  ...Array.from({ length: 6 }, (_, index) => ({
+    label: `M${index + 7}`,
+    type: "MONTHLY" as const,
+    month: index + 7,
+  })),
   { label: "Final", type: "FINAL" as const, month: null },
 ];
 
@@ -124,13 +132,12 @@ export function ReportsPage() {
         ]}
       />
 
-      <PageHeader
-        title="Relatórios por projeto"
-      />
+      <PageHeader title="Relatórios por projeto" />
 
       {pendingMyReview > 0 && (
         <div className="mb-5 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-          Você tem <strong>{pendingMyReview}</strong> relatório(s) aguardando sua revisão.
+          Você tem <strong>{pendingMyReview}</strong> relatório(s) aguardando
+          sua revisão.
         </div>
       )}
 
@@ -176,7 +183,7 @@ export function ReportsPage() {
         <Badge tone="warning">Em revisão</Badge>
         <Badge tone="orange">Em ajuste</Badge>
         <Badge tone="danger">Atrasado</Badge>
-        <Badge>Não devido</Badge>
+        <Badge>Prazo não iniciado</Badge>
       </div>
 
       <Card>
@@ -190,7 +197,9 @@ export function ReportsPage() {
           <table className="w-full min-w-[1050px] text-left text-sm">
             <thead className="border-b border-slate-200 bg-slate-50 text-xs uppercase text-slate-500">
               <tr>
-                <th className="sticky left-0 bg-slate-50 px-4 py-3">Projeto / aluno</th>
+                <th className="sticky left-0 bg-slate-50 px-4 py-3">
+                  Projeto / aluno
+                </th>
                 {reportColumns.map((column) => (
                   <th key={column.label} className="px-3 py-3 text-center">
                     {column.label}
@@ -201,56 +210,71 @@ export function ReportsPage() {
             <tbody className="divide-y divide-slate-100">
               {loading ? (
                 <tr>
-                  <td colSpan={15} className="px-4 py-10 text-center text-sm text-slate-500">
+                  <td
+                    colSpan={15}
+                    className="px-4 py-10 text-center text-sm text-slate-500"
+                  >
                     Carregando relatórios...
                   </td>
                 </tr>
-              ) : pageRows.map((row) => (
-                <tr
-                  key={row.project.id}
-                  onClick={() => navigate(`/projects/${row.project.id}/reports`)}
-                  className="cursor-pointer transition hover:bg-indigo-50/50"
-                >
-                  <td className="sticky left-0 bg-white px-4 py-4">
-                    <strong className="block max-w-[320px] truncate font-medium text-slate-800">
-                      {row.project.title}
-                    </strong>
-                    <small className="mt-1 block text-xs text-slate-500">
-                      {row.project.student.name}
-                      {row.project.studentCourse ? ` • ${row.project.studentCourse}` : ""}
-                    </small>
-                  </td>
-                  {reportColumns.map((column) => {
-                    const cell = cellFor(row, column);
-                    return (
-                      <td key={column.label} className="px-3 py-4 text-center">
-                        {cell ? (
-                          <span
-                            className={`inline-block h-3 w-3 rounded-full ${
-                              cell === "APPROVED"
-                                ? "bg-emerald-500"
-                                : cell === "IN_REVIEW"
-                                  ? "bg-amber-400"
-                                  : cell === "CHANGES_REQUESTED"
-                                    ? "bg-orange-500"
-                                    : cell === "LATE"
-                                      ? "bg-red-500"
-                                      : "bg-slate-200"
-                            }`}
-                            title={cellLabels[cell]}
-                            aria-label={cellLabels[cell]}
-                          />
-                        ) : (
-                          <span className="text-slate-300">—</span>
-                        )}
-                      </td>
-                    );
-                  })}
-                </tr>
-              ))}
+              ) : (
+                pageRows.map((row) => (
+                  <tr
+                    key={row.project.id}
+                    onClick={() =>
+                      navigate(`/projects/${row.project.id}/reports`)
+                    }
+                    className="cursor-pointer transition hover:bg-indigo-50/50"
+                  >
+                    <td className="sticky left-0 bg-white px-4 py-4">
+                      <strong className="block max-w-[320px] truncate font-medium text-slate-800">
+                        {row.project.title}
+                      </strong>
+                      <small className="mt-1 block text-xs text-slate-500">
+                        {row.project.student.name}
+                        {row.project.studentCourse
+                          ? ` • ${row.project.studentCourse}`
+                          : ""}
+                      </small>
+                    </td>
+                    {reportColumns.map((column) => {
+                      const cell = cellFor(row, column);
+                      return (
+                        <td
+                          key={column.label}
+                          className="px-3 py-4 text-center"
+                        >
+                          {cell ? (
+                            <span
+                              className={`inline-block h-3 w-3 rounded-full ${
+                                cell === "APPROVED"
+                                  ? "bg-emerald-500"
+                                  : cell === "IN_REVIEW"
+                                    ? "bg-amber-400"
+                                    : cell === "CHANGES_REQUESTED"
+                                      ? "bg-orange-500"
+                                      : cell === "LATE"
+                                        ? "bg-red-500"
+                                        : "bg-slate-200"
+                              }`}
+                              title={cellLabels[cell]}
+                              aria-label={cellLabels[cell]}
+                            />
+                          ) : (
+                            <span className="text-slate-300">—</span>
+                          )}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                ))
+              )}
               {!loading && pageRows.length === 0 && (
                 <tr>
-                  <td colSpan={15} className="px-4 py-10 text-center text-sm text-slate-500">
+                  <td
+                    colSpan={15}
+                    className="px-4 py-10 text-center text-sm text-slate-500"
+                  >
                     Nenhum projeto encontrado com os filtros selecionados.
                   </td>
                 </tr>

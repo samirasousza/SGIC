@@ -10,6 +10,7 @@ interface LoginFormsProps {
 export function LoginForms({ onSubmit }: LoginFormsProps) {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const submit = async (formData: FormData) => {
     setMessage("");
@@ -43,7 +44,7 @@ export function LoginForms({ onSubmit }: LoginFormsProps) {
         correspondente.
       </p>
 
-      {/* Formulário*/}
+      {/* Formulário */}
       <form action={submit} className="flex flex-col gap-3.5">
         {/* Campo E-mail */}
         <label className="flex flex-col">
@@ -66,15 +67,28 @@ export function LoginForms({ onSubmit }: LoginFormsProps) {
           <span className="mb-1.5 text-[10px] font-semibold text-text-main">
             Senha
           </span>
-          <input
-            name="password"
-            type="password"
-            placeholder="Digite sua senha"
-            autoComplete="current-password"
-            required
-            onChange={() => setMessage("")}
-            className="h-[43px] w-full rounded-lg border border-line bg-surface px-3 text-[11px] text-ink outline-none transition-all placeholder:text-muted/60 focus:border-blue focus:ring-1 focus:ring-blue-soft"
-          />
+
+          <div className="relative">
+            <input
+              name="password"
+              type={showPassword ? "text" : "password"}
+              placeholder="Digite sua senha"
+              autoComplete="current-password"
+              required
+              onChange={() => setMessage("")}
+              className="h-[43px] w-full rounded-lg border border-line bg-surface px-3 pr-10 text-[11px] text-ink outline-none transition-all placeholder:text-muted/60 focus:border-blue focus:ring-1 focus:ring-blue-soft"
+            />
+
+            <button
+              type="button"
+              onClick={() => setShowPassword((prev) => !prev)}
+              aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
+              aria-pressed={showPassword}
+              className="absolute inset-y-0 right-0 flex items-center justify-center px-3 text-muted transition-colors hover:text-ink"
+            >
+              <Icon name={showPassword ? "eye-off" : "eye"} size={16} />
+            </button>
+          </div>
         </label>
 
         {message && (
