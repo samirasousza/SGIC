@@ -267,7 +267,7 @@ export function ProjectReportsDetail() {
         <Badge tone="warning">Em revisão</Badge>
         <Badge tone="orange">Em ajuste</Badge>
         <Badge tone="danger">Atrasado</Badge>
-        <Badge>Não devido</Badge>
+        <Badge>Prazo não iniciado</Badge>
       </div>
 
       <Card>
